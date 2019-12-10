@@ -6,6 +6,6 @@ namespace Alamut.Kafka.Contracts
 {
     public interface ISubscriber
     {
-        Task Handle(Message message, CancellationToken token);
+        Task Handle(string message, CancellationToken token);
     }
 }

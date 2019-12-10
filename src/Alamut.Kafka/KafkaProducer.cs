@@ -21,21 +21,21 @@ namespace Alamut.Kafka
              _producer = new ProducerBuilder<Null,string>(config).Build();
         }
 
-        public async Task Publish(string topic, Message message)
+        public async Task Publish(string topic, string message)
         {
             if (message == null) { throw new ArgumentNullException(nameof(message));}
             if (string.IsNullOrEmpty(topic)) { throw new ArgumentNullException(nameof(topic)); }
 
              try
             {
-                var serializedMessage = JsonConvert.SerializeObject(message);
+                // var serializedMessage = JsonConvert.SerializeObject(message);
 
                 // Note: Awaiting the asynchronous produce request below prevents flow of execution
                 // from proceeding until the acknowledgement from the broker is received (at the 
                 // expense of low throughput).
                 var deliveryReport = await _producer.ProduceAsync(
                     topic,
-                    new Message<Null, string> {Value = serializedMessage});
+                    new Message<Null, string> {Value = message});
 
                 Console.WriteLine($"delivered to: {deliveryReport.TopicPartitionOffset}");
             }

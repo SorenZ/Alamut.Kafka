@@ -11,7 +11,6 @@ using Confluent.Kafka;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 
 namespace Kafka.Consumer
 {
@@ -149,8 +148,7 @@ namespace Kafka.Consumer
 
                 _logger.LogTrace($"<{_kafkaConfig.GroupId}> received message on topic <{result.Topic}>");
 
-                // 4: The message handler is called to process the actual event
-                await handler.Handle(JsonConvert.DeserializeObject<Message>(result.Value), token);
+                await handler.Handle(result.Value, token);
             }
         }
 

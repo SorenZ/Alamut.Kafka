@@ -8,9 +8,9 @@ namespace Alamut.Kafka.Consumer.Subscribers
 {
     public class SendSms : ISubscriber
     {
-        public Task Handle(Message message, CancellationToken token)
+        public Task Handle(string message, CancellationToken token)
         {
-            Console.WriteLine($"Received message {message.Data}");
+            Console.WriteLine($"Received message {message }");
 
             return Task.CompletedTask;
         }
