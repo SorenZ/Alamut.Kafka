@@ -4,11 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Alamut.Kafka;
+using Alamut.Kafka.Contracts;
 using Alamut.Kafka.Models;
 using Confluent.Kafka;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace Kafka.Consumer
 {
@@ -18,14 +21,18 @@ namespace Kafka.Consumer
         private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<KafkaService> _logger;
         private readonly KafkaConfig _kafkaConfig;
+        private readonly SubscriberHandler _handler;
+
 
         public KafkaService(IServiceProvider serviceProvider,
         ILogger<KafkaService> logger,
-        KafkaConfig kafkaConfig)
+        KafkaConfig kafkaConfig,
+        SubscriberHandler handler)
         {
             _kafkaConfig = kafkaConfig;
             _serviceProvider = serviceProvider;
             _logger = logger;
+            _handler = handler;
         }
 
 
@@ -92,7 +99,8 @@ namespace Kafka.Consumer
                             continue;
                         }
 
-                        Console.WriteLine($"Received message at {consumeResult.TopicPartitionOffset}: {consumeResult.Value}");
+                        // Console.WriteLine($"Received message at {consumeResult.TopicPartitionOffset}: {consumeResult.Value}");
+                        await HandleMessage(consumeResult, cancellationToken);
 
                         if (consumeResult.Offset % commitPeriod == 0)
                         {
@@ -123,6 +131,46 @@ namespace Kafka.Consumer
                 Console.WriteLine("Closing consumer.");
                 consumer.Close();
             }
+        }
+
+        private async Task HandleMessage(ConsumeResult<Ignore, string> result, CancellationToken token)
+        {
+            var isTopicHandlerAvailable = _handler.TopicHandlers.TryGetValue(result.Topic, out var handlerType);
+            if(!isTopicHandlerAvailable)
+            { 
+                _logger.LogWarning($"<{_kafkaConfig.GroupId}> received message on topic <{result.Topic}>, but there is no handler registered for topic.");
+                return; 
+            }
+
+            using (var scope = _serviceProvider.CreateScope())
+            {
+
+                var handler = GetHandler(scope, handlerType);
+
+                _logger.LogTrace($"<{_kafkaConfig.GroupId}> received message on topic <{result.Topic}>");
+
+                // 4: The message handler is called to process the actual event
+                await handler.Handle(JsonConvert.DeserializeObject<Message>(result.Value), token);
+            }
+        }
+
+        internal ISubscriber GetHandler(IServiceScope scope, Type handlerType)
+        {
+            var handler = scope.ServiceProvider.GetService(handlerType);
+
+            if (handler == null)
+            {
+                var nullRefEx = new NullReferenceException($"<{_kafkaConfig.GroupId}> exception: no handler found for type <{handlerType}>");
+                throw nullRefEx;
+            }
+
+            if (handler is ISubscriber eventHandler)
+            {
+                return eventHandler;
+            }
+
+            var castEx = new InvalidCastException($"<{_kafkaConfig.GroupId}> exception: handler <{handlerType}> not of type <{typeof(ISubscriber)}>");
+            throw castEx;
         }
     }
 }

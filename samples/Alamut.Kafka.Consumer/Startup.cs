@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Alamut.AspNet.Configuration;
+using Alamut.Kafka.Consumer.Subscribers;
 using Alamut.Kafka.Models;
 using Kafka.Consumer;
 using Microsoft.AspNetCore.Builder;
@@ -28,6 +29,14 @@ namespace Alamut.Kafka.Consumer
         {
             services.AddPoco<KafkaConfig>(Configuration);
             services.AddHostedService<KafkaService>();
+            services.AddSingleton(_ => 
+            {
+                return new SubscriberHandler()
+                    .RegisterTopicHandler<SendSms>("mobin-soft");
+                    // .RegisterTopicHandler
+            });
+            services.AddScoped<SendSms>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

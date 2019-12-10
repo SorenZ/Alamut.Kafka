@@ -2,6 +2,7 @@ namespace Alamut.Kafka.Models
 {
     public class Message
     {
+        internal Message() {} // default constructor for Json DeSerialization  
         public Message(object data)
         {
             this.Data = data;
@@ -13,6 +14,6 @@ namespace Alamut.Kafka.Models
         }
 
         public string EventName { get; set; }
-        public object Data { get; }
+        public object Data { get; set; }
     }
 }
