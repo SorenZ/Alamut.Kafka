@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Alamut.AspNet.Configuration;
 using Alamut.Kafka.Consumer.Subscribers;
 using Alamut.Kafka.Models;
-using Kafka.Consumer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -28,14 +27,21 @@ namespace Alamut.Kafka.Consumer
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddPoco<KafkaConfig>(Configuration);
-            services.AddHostedService<KafkaService>();
+            // services.AddHostedService<KafkaService>();
+            // services.AddSingleton(_ => 
+            // {
+            //     return new SubscriberHandler()
+            //         .RegisterTopicHandler<SendSms>("mobin-soft");
+            //         // .RegisterTopicHandler
+            // });
+            services.AddHostedService<KafkaDynamicService>();
             services.AddSingleton(_ => 
             {
                 return new SubscriberHandler()
-                    .RegisterTopicHandler<SendSms>("mobin-soft");
+                    .RegisterTopicHandler<SendSmsDynamic>("mobin-soft");
                     // .RegisterTopicHandler
             });
-            services.AddScoped<SendSms>();
+            services.AddScoped<SendSmsDynamic>();
 
         }
 

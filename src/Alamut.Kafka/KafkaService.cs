@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Alamut.Kafka;
 using Alamut.Kafka.Contracts;
 using Alamut.Kafka.Models;
 using Confluent.Kafka;
@@ -12,15 +11,15 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Kafka.Consumer
+namespace Alamut.Kafka
 {
     public class KafkaService : BackgroundService
     {
-        private const int commitPeriod = 5;
-        private readonly IServiceProvider _serviceProvider;
-        private readonly ILogger<KafkaService> _logger;
-        private readonly KafkaConfig _kafkaConfig;
-        private readonly SubscriberHandler _handler;
+        internal const int commitPeriod = 5;
+        internal readonly IServiceProvider _serviceProvider;
+        internal readonly ILogger<KafkaService> _logger;
+        internal readonly KafkaConfig _kafkaConfig;
+        internal readonly SubscriberHandler _handler;
 
 
         public KafkaService(IServiceProvider serviceProvider,
@@ -80,7 +79,7 @@ namespace Kafka.Consumer
             return Task.CompletedTask;
         }
 
-        private async Task Consume(IConsumer<Ignore, string> consumer, CancellationToken cancellationToken)
+        virtual internal async Task Consume(IConsumer<Ignore, string> consumer, CancellationToken cancellationToken)
         {
             try
             {
@@ -101,7 +100,8 @@ namespace Kafka.Consumer
                         // Console.WriteLine($"Received message at {consumeResult.TopicPartitionOffset}: {consumeResult.Value}");
                         await HandleMessage(consumeResult, cancellationToken);
 
-                        if (consumeResult.Offset % commitPeriod == 0)
+                        // if (consumeResult.Offset % commitPeriod == 0)
+                        if (true)
                         {
                             // The Commit method sends a "commit offsets" request to the Kafka
                             // cluster and synchronously waits for the response. This is very
@@ -132,13 +132,13 @@ namespace Kafka.Consumer
             }
         }
 
-        private async Task HandleMessage(ConsumeResult<Ignore, string> result, CancellationToken token)
+        virtual internal async Task HandleMessage(ConsumeResult<Ignore, string> result, CancellationToken token)
         {
             var isTopicHandlerAvailable = _handler.TopicHandlers.TryGetValue(result.Topic, out var handlerType);
-            if(!isTopicHandlerAvailable)
-            { 
+            if (!isTopicHandlerAvailable)
+            {
                 _logger.LogWarning($"<{_kafkaConfig.GroupId}> received message on topic <{result.Topic}>, but there is no handler registered for topic.");
-                return; 
+                return;
             }
 
             using (var scope = _serviceProvider.CreateScope())
@@ -152,7 +152,7 @@ namespace Kafka.Consumer
             }
         }
 
-        internal ISubscriber GetHandler(IServiceScope scope, Type handlerType)
+        virtual internal ISubscriber GetHandler(IServiceScope scope, Type handlerType)
         {
             var handler = scope.ServiceProvider.GetService(handlerType);
 

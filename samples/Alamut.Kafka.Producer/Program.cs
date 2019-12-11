@@ -16,7 +16,11 @@ namespace Alamut.Kafka.Producer
             while (true)
             {
                 var message = Console.ReadLine();
-                await publisher.Publish("mobin-soft", message);
+                dynamic dynamicMessage = new 
+                {
+                    Foo = message
+                };
+                await publisher.Publish("mobin-soft", dynamicMessage);
             }
         }
     }

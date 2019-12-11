@@ -15,4 +15,14 @@ namespace Alamut.Kafka.Consumer.Subscribers
             return Task.CompletedTask;
         }
     }
+
+    public class SendSmsDynamic : IDynamicSubscriber
+    {
+        public Task Handle(dynamic message, CancellationToken token)
+        {
+            Console.WriteLine($"Received message { message.Foo }");
+
+            return Task.CompletedTask;
+        }
+    }
 }

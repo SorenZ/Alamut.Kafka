@@ -6,5 +6,6 @@ namespace Alamut.Kafka.Contracts
     public interface IPublisher
     {
          Task Publish(string topic, string message);
+         Task Publish(string topic, object message);
     }
 }

@@ -8,4 +8,9 @@ namespace Alamut.Kafka.Contracts
     {
         Task Handle(string message, CancellationToken token);
     }
+
+    public interface IDynamicSubscriber 
+    {
+        Task Handle(dynamic message, CancellationToken token);
+    }
 }

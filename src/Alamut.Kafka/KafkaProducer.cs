@@ -1,6 +1,5 @@
 using System;
 using System.Threading.Tasks;
-
 using Alamut.Kafka.Contracts;
 using Alamut.Kafka.Models;
 
@@ -45,6 +44,11 @@ namespace Alamut.Kafka
             }
 
 
+        }
+
+        public async Task Publish(string topic, object message)
+        {
+            await Publish(topic, JsonConvert.SerializeObject(message));
         }
     }
 }
