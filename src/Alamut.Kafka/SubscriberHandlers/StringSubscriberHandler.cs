@@ -13,13 +13,13 @@ namespace Alamut.Kafka.SubscriberHandlers
     public class StringSubscriberHandler :  ISubscriberHandler
     {
         private readonly IServiceProvider _serviceProvider;
-        private readonly ILogger<KafkaService> _logger;
+        private readonly ILogger _logger;
         private readonly KafkaConfig _kafkaConfig;
         private readonly SubscriberBinding _binding;
 
 
         public StringSubscriberHandler(IServiceProvider serviceProvider,
-        ILogger<KafkaService> logger,
+        ILogger<ISubscriberHandler> logger,
         KafkaConfig kafkaConfig,
         SubscriberBinding binding)
         {

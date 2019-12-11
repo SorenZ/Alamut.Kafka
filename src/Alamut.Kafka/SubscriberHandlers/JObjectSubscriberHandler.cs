@@ -6,11 +6,11 @@ using Alamut.Kafka.Models;
 using Confluent.Kafka;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Alamut.Kafka.SubscriberHandlers
 {
-    public class DynamicSubscriberHandler :  ISubscriberHandler
+    public class JObjectSubscriberHandler:  ISubscriberHandler
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly ILogger _logger;
@@ -18,7 +18,7 @@ namespace Alamut.Kafka.SubscriberHandlers
         private readonly SubscriberBinding _binding;
 
 
-        public DynamicSubscriberHandler(IServiceProvider serviceProvider,
+        public JObjectSubscriberHandler(IServiceProvider serviceProvider,
         ILogger<ISubscriberHandler> logger,
         KafkaConfig kafkaConfig,
         SubscriberBinding binding)
@@ -45,28 +45,30 @@ namespace Alamut.Kafka.SubscriberHandlers
 
                 _logger.LogTrace($"<{_kafkaConfig.GroupId}> received message on topic <{result.Topic}>");
 
-                dynamic value = JsonConvert.DeserializeObject(result.Value);
+                var value = JObject.Parse(result.Value);
 
                 await handler.Handle(value, token);
             }
         }
 
-        private IDynamicSubscriber GetHandler(IServiceScope scope, Type handlerType)
+        private IJObjectSubscriber GetHandler(IServiceScope scope, Type handlerType)
         {
             var handler = scope.ServiceProvider.GetService(handlerType);
 
             if (handler == null)
             {
-                var nullRefEx = new NullReferenceException($"<{_kafkaConfig.GroupId}> exception: no handler found for type <{handlerType}>");
+                var nullRefEx = new NullReferenceException(
+                    $"<{_kafkaConfig.GroupId}> exception: no handler found for type <{handlerType}>");
                 throw nullRefEx;
             }
 
-            if (handler is IDynamicSubscriber eventHandler)
+            if (handler is IJObjectSubscriber eventHandler)
             {
                 return eventHandler;
             }
 
-            var castEx = new InvalidCastException($"<{_kafkaConfig.GroupId}> exception: handler <{handlerType}> not of type <{typeof(IDynamicSubscriber)}>");
+            var castEx = new InvalidCastException(
+                $"<{_kafkaConfig.GroupId}> exception: handler <{handlerType}> not of type <{typeof(IJObjectSubscriber)}>");
             throw castEx;
         }
     }
