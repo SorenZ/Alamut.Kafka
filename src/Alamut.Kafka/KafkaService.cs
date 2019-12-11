@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Alamut.Kafka.Contracts;
 using Alamut.Kafka.Models;
+using Alamut.Kafka.SubscriberHandlers;
 using Confluent.Kafka;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -16,19 +15,16 @@ namespace Alamut.Kafka
     public class KafkaService : BackgroundService
     {
         internal const int commitPeriod = 5;
-        internal readonly IServiceProvider _serviceProvider;
         internal readonly ILogger<KafkaService> _logger;
         internal readonly KafkaConfig _kafkaConfig;
-        internal readonly SubscriberHandler _handler;
+        internal readonly ISubscriberHandler _handler;
 
 
-        public KafkaService(IServiceProvider serviceProvider,
-        ILogger<KafkaService> logger,
+        public KafkaService(ILogger<KafkaService> logger,
         KafkaConfig kafkaConfig,
-        SubscriberHandler handler)
+        ISubscriberHandler handler)
         {
             _kafkaConfig = kafkaConfig;
-            _serviceProvider = serviceProvider;
             _logger = logger;
             _handler = handler;
         }
@@ -79,7 +75,7 @@ namespace Alamut.Kafka
             return Task.CompletedTask;
         }
 
-        virtual internal async Task Consume(IConsumer<Ignore, string> consumer, CancellationToken cancellationToken)
+        private async Task Consume(IConsumer<Ignore, string> consumer, CancellationToken cancellationToken)
         {
             try
             {
@@ -98,7 +94,7 @@ namespace Alamut.Kafka
                         }
 
                         // Console.WriteLine($"Received message at {consumeResult.TopicPartitionOffset}: {consumeResult.Value}");
-                        await HandleMessage(consumeResult, cancellationToken);
+                        await _handler.HandleMessage(consumeResult, cancellationToken);
 
                         // if (consumeResult.Offset % commitPeriod == 0)
                         if (true)
@@ -131,44 +127,6 @@ namespace Alamut.Kafka
                 consumer.Close();
             }
         }
-
-        virtual internal async Task HandleMessage(ConsumeResult<Ignore, string> result, CancellationToken token)
-        {
-            var isTopicHandlerAvailable = _handler.TopicHandlers.TryGetValue(result.Topic, out var handlerType);
-            if (!isTopicHandlerAvailable)
-            {
-                _logger.LogWarning($"<{_kafkaConfig.GroupId}> received message on topic <{result.Topic}>, but there is no handler registered for topic.");
-                return;
-            }
-
-            using (var scope = _serviceProvider.CreateScope())
-            {
-
-                var handler = GetHandler(scope, handlerType);
-
-                _logger.LogTrace($"<{_kafkaConfig.GroupId}> received message on topic <{result.Topic}>");
-
-                await handler.Handle(result.Value, token);
-            }
-        }
-
-        virtual internal ISubscriber GetHandler(IServiceScope scope, Type handlerType)
-        {
-            var handler = scope.ServiceProvider.GetService(handlerType);
-
-            if (handler == null)
-            {
-                var nullRefEx = new NullReferenceException($"<{_kafkaConfig.GroupId}> exception: no handler found for type <{handlerType}>");
-                throw nullRefEx;
-            }
-
-            if (handler is ISubscriber eventHandler)
-            {
-                return eventHandler;
-            }
-
-            var castEx = new InvalidCastException($"<{_kafkaConfig.GroupId}> exception: handler <{handlerType}> not of type <{typeof(ISubscriber)}>");
-            throw castEx;
-        }
+        
     }
 }

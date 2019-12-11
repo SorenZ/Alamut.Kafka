@@ -6,22 +6,32 @@ using Alamut.Kafka.Models;
 using Confluent.Kafka;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 
-namespace Alamut.Kafka
+namespace Alamut.Kafka.SubscriberHandlers
 {
-    public class KafkaDynamicService : KafkaService
+
+    public class StringSubscriberHandler :  ISubscriberHandler
     {
-        public KafkaDynamicService(IServiceProvider serviceProvider, 
-        ILogger<KafkaService> logger, 
-        KafkaConfig kafkaConfig, 
-        SubscriberHandler handler) : base(serviceProvider, logger, kafkaConfig, handler)
+        private readonly IServiceProvider _serviceProvider;
+        private readonly ILogger<KafkaService> _logger;
+        private readonly KafkaConfig _kafkaConfig;
+        private readonly SubscriberBinding _binding;
+
+
+        public StringSubscriberHandler(IServiceProvider serviceProvider,
+        ILogger<KafkaService> logger,
+        KafkaConfig kafkaConfig,
+        SubscriberBinding binding)
         {
+            _kafkaConfig = kafkaConfig;
+            _serviceProvider = serviceProvider;
+            _logger = logger;
+            _binding = binding;
         }
 
-        override internal async Task HandleMessage(ConsumeResult<Ignore, string> result, CancellationToken token)
+        public async Task HandleMessage(ConsumeResult<Ignore, string> result, CancellationToken token)
         {
-            var isTopicHandlerAvailable = _handler.TopicHandlers.TryGetValue(result.Topic, out var handlerType);
+            var isTopicHandlerAvailable = _binding.TopicHandlers.TryGetValue(result.Topic, out var handlerType);
             if (!isTopicHandlerAvailable)
             {
                 _logger.LogWarning($"<{_kafkaConfig.GroupId}> received message on topic <{result.Topic}>, but there is no handler registered for topic.");
@@ -35,13 +45,11 @@ namespace Alamut.Kafka
 
                 _logger.LogTrace($"<{_kafkaConfig.GroupId}> received message on topic <{result.Topic}>");
 
-                dynamic value = JsonConvert.DeserializeObject(result.Value);
-
-                await handler.Handle(value, token);
+                await handler.Handle(result.Value, token);
             }
         }
 
-        new internal IDynamicSubscriber GetHandler(IServiceScope scope, Type handlerType)
+        private ISubscriber GetHandler(IServiceScope scope, Type handlerType)
         {
             var handler = scope.ServiceProvider.GetService(handlerType);
 
@@ -51,12 +59,12 @@ namespace Alamut.Kafka
                 throw nullRefEx;
             }
 
-            if (handler is IDynamicSubscriber eventHandler)
+            if (handler is ISubscriber eventHandler)
             {
                 return eventHandler;
             }
 
-            var castEx = new InvalidCastException($"<{_kafkaConfig.GroupId}> exception: handler <{handlerType}> not of type <{typeof(IDynamicSubscriber)}>");
+            var castEx = new InvalidCastException($"<{_kafkaConfig.GroupId}> exception: handler <{handlerType}> not of type <{typeof(ISubscriber)}>");
             throw castEx;
         }
     }

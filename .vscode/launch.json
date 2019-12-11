@@ -22,6 +22,9 @@
             },
             "sourceFileMap": {
                 "/Views": "${workspaceFolder}/Views"
+            },
+            "launchBrowser": {
+                "enabled": false
             }
         },
         {
