@@ -47,11 +47,11 @@ namespace Alamut.Kafka.Consumer
             // -----------------------------------------------------------------
             
             // --------------<( JObject handler)>---------------------------- 
-            services.AddSingleton<ISubscriberHandler,JObjectSubscriberHandler>();
-            services.AddSingleton(_ => 
-                new SubscriberBinding()
-                    .RegisterTopicHandler<SendSmsJObject>("mobin-soft"));
-            services.AddScoped<SendSmsJObject>();
+            // services.AddSingleton<ISubscriberHandler,JObjectSubscriberHandler>();
+            // services.AddSingleton(_ => 
+            //     new SubscriberBinding()
+            //         .RegisterTopicHandler<SendSmsJObject>("mobin-soft"));
+            // services.AddScoped<SendSmsJObject>();
             // -----------------------------------------------------------------
 
             // --------------<( Generic handler)>---------------------------- 
