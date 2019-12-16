@@ -15,6 +15,7 @@ namespace Alamut.Kafka.SubscriberHandlers
 
             return this;
         }
+
     }
 
 

@@ -38,4 +38,14 @@ namespace Alamut.Kafka.Consumer.Subscribers
             return Task.CompletedTask;
         }
     }
+
+    public class SendSmsGeneric : IGenericSubscriber<Foo>
+    {
+        public Task Handle(Foo message, CancellationToken token)
+        {
+            Console.WriteLine($"Received message { message.Bar }");
+
+            return Task.CompletedTask;
+        }
+    }
 }

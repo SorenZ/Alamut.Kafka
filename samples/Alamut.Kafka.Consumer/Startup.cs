@@ -53,6 +53,11 @@ namespace Alamut.Kafka.Consumer
                     .RegisterTopicHandler<SendSmsJObject>("mobin-soft"));
             services.AddScoped<SendSmsJObject>();
             // -----------------------------------------------------------------
+
+            // --------------<( Generic handler)>---------------------------- 
+            services.AddSingleton<ISubscriberHandler,GenericSubscriberHandler>();
+            services.RegisterSubscriberHandler<SendSmsGeneric, Foo>("mobin-soft");
+            // -----------------------------------------------------------------
             
 
         }
