@@ -21,6 +21,7 @@ namespace Alamut.Kafka.Producer
                     Bar = message
                 };
                 await publisher.Publish("mobin-soft", dynamicMessage);
+                // await publisher.Publish("mobin-soft", "send sms to 0912");
             }
         }
     }

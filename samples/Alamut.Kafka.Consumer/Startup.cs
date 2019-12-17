@@ -31,11 +31,11 @@ namespace Alamut.Kafka.Consumer
             services.AddHostedService<KafkaService>();
 
             // --------------<( string handler)>---------------------------- 
-            //services.AddSingleton<ISubscriberHandler, StringSubscriberHandler>();
-            //services.AddSingleton(_ =>
+            // services.AddSingleton<ISubscriberHandler, StringSubscriberHandler>();
+            // services.AddSingleton(_ =>
             //    new SubscriberBinding()
             //        .RegisterTopicHandler<SendSms>("mobin-soft"));
-            //services.AddScoped<SendSms>();
+            // services.AddScoped<SendSms>();
             // -----------------------------------------------------------------
 
             // --------------<( dynamic handler)>---------------------------- 
@@ -57,6 +57,7 @@ namespace Alamut.Kafka.Consumer
             // --------------<( Generic handler)>---------------------------- 
             services.AddSingleton<ISubscriberHandler, GenericSubscriberHandler>();
             services.RegisterSubscriberHandler<SendSmsGeneric, Foo>("mobin-soft");
+            // services.RegisterSubscriberHandler<SendSmsGeneric, Foo>("mobin-soft");
             // -----------------------------------------------------------------
 
 
