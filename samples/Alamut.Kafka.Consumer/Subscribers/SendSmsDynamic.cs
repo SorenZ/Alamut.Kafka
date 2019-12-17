@@ -5,11 +5,11 @@ using Alamut.Kafka.Contracts;
 
 namespace Alamut.Kafka.Consumer.Subscribers
 {
-    public class SendSms : ISubscriber
+    public class SendSmsDynamic : IDynamicSubscriber
     {
-        public Task Handle(string message, CancellationToken token)
+        public Task Handle(dynamic message, CancellationToken token)
         {
-            Console.WriteLine($"Received message {message }");
+            Console.WriteLine($"Received message { message.Foo }");
 
             return Task.CompletedTask;
         }

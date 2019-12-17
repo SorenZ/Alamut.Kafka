@@ -29,13 +29,13 @@ namespace Alamut.Kafka.Consumer
         {
             services.AddPoco<KafkaConfig>(Configuration);
             services.AddHostedService<KafkaService>();
-            
+
             // --------------<( string handler)>---------------------------- 
-            // services.AddSingleton<ISubscriberHandler,StringSubscriberHandler>();
-            // services.AddSingleton(_ => 
-            //     new SubscriberBinding()
-            //         .RegisterTopicHandler<SendSms>("mobin-soft"));
-            // services.AddScoped<SendSms>();
+            //services.AddSingleton<ISubscriberHandler, StringSubscriberHandler>();
+            //services.AddSingleton(_ =>
+            //    new SubscriberBinding()
+            //        .RegisterTopicHandler<SendSms>("mobin-soft"));
+            //services.AddScoped<SendSms>();
             // -----------------------------------------------------------------
 
             // --------------<( dynamic handler)>---------------------------- 
@@ -45,7 +45,7 @@ namespace Alamut.Kafka.Consumer
             //         .RegisterTopicHandler<SendSmsDynamic>("mobin-soft"));
             // services.AddScoped<SendSmsDynamic>();
             // -----------------------------------------------------------------
-            
+
             // --------------<( JObject handler)>---------------------------- 
             // services.AddSingleton<ISubscriberHandler,JObjectSubscriberHandler>();
             // services.AddSingleton(_ => 
@@ -55,10 +55,10 @@ namespace Alamut.Kafka.Consumer
             // -----------------------------------------------------------------
 
             // --------------<( Generic handler)>---------------------------- 
-            services.AddSingleton<ISubscriberHandler,GenericSubscriberHandler>();
+            services.AddSingleton<ISubscriberHandler, GenericSubscriberHandler>();
             services.RegisterSubscriberHandler<SendSmsGeneric, Foo>("mobin-soft");
             // -----------------------------------------------------------------
-            
+
 
         }
 

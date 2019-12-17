@@ -41,6 +41,7 @@ namespace Alamut.Kafka
             catch (ProduceException<Null, string> e)
             {
                 Console.WriteLine($"failed to deliver message: {e.Message} [{e.Error.Code}]");
+                throw;
             }
 
 
