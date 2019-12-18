@@ -49,7 +49,7 @@ namespace Alamut.Kafka.SubscriberHandlers
             }
         }
 
-        private ISubscriber GetHandler(IServiceScope scope, Type handlerType)
+        private IStringSubscriber GetHandler(IServiceScope scope, Type handlerType)
         {
             var handler = scope.ServiceProvider.GetService(handlerType);
 
@@ -59,12 +59,12 @@ namespace Alamut.Kafka.SubscriberHandlers
                 throw nullRefEx;
             }
 
-            if (handler is ISubscriber eventHandler)
+            if (handler is IStringSubscriber eventHandler)
             {
                 return eventHandler;
             }
 
-            var castEx = new InvalidCastException($"<{_kafkaConfig.GroupId}> exception: handler <{handlerType}> not of type <{typeof(ISubscriber)}>");
+            var castEx = new InvalidCastException($"<{_kafkaConfig.GroupId}> exception: handler <{handlerType}> not of type <{typeof(IStringSubscriber)}>");
             throw castEx;
         }
     }

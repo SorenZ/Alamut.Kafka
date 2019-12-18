@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Alamut.Kafka.Contracts
 {
-    public interface IGenericSubscriber<T>
+    public interface ISubscriber<T>
     {
         Task Handle(T message, CancellationToken token);
     }

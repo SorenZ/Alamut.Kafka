@@ -37,7 +37,7 @@ namespace Alamut.Kafka
                 BootstrapServers = _kafkaConfig.BootstrapServers,
                 GroupId = _kafkaConfig.GroupId,
                 EnableAutoCommit = false,
-                StatisticsIntervalMs = 5000,
+                // StatisticsIntervalMs = 5000,
                 SessionTimeoutMs = 6000,
                 AutoOffsetReset = AutoOffsetReset.Earliest,
                 EnablePartitionEof = true
@@ -118,6 +118,10 @@ namespace Alamut.Kafka
                     catch (ConsumeException e)
                     {
                         Console.WriteLine($"Consume error: {e.Error.Reason}");
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.LogError(e, $"Error occurred on consumer handler Method.");
                     }
                 }
             }

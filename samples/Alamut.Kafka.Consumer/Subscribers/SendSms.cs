@@ -5,7 +5,7 @@ using Alamut.Kafka.Contracts;
 
 namespace Alamut.Kafka.Consumer.Subscribers
 {
-    public class SendSms : ISubscriber
+    public class SendSms : IStringSubscriber
     {
         public Task Handle(string message, CancellationToken token)
         {

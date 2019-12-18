@@ -4,7 +4,7 @@ using Alamut.Kafka.Models;
 
 namespace Alamut.Kafka.Contracts
 {
-    public interface ISubscriber
+    public interface IStringSubscriber
     {
         Task Handle(string message, CancellationToken token);
     }

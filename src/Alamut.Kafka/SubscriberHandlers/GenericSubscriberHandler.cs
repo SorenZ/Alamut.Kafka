@@ -45,7 +45,16 @@ namespace Alamut.Kafka.SubscriberHandlers
 
                 dynamic value = JsonConvert.DeserializeObject(result.Value, handlerType.Value);
                 
-                await (Task) handler.Handle(value, (dynamic)token);
+                await (Task) handler.Handle(value, (dynamic)token);    
+
+                // try
+                // {
+                //     await (Task) handler.Handle(value, (dynamic)token);    
+                // }
+                // catch (System.Exception)
+                // {            
+                // }
+                
 
                 // if(value == null)
                 // { _logger.LogWarning($"could not cast value : {result.Value} to data structure type : {handlerType.Value}"); }
