@@ -44,8 +44,13 @@ namespace Alamut.Kafka.SubscriberHandlers
                 _logger.LogTrace($"<{_kafkaConfig.GroupId}> received message on topic <{result.Topic}>");
 
                 dynamic value = JsonConvert.DeserializeObject(result.Value, handlerType.Value);
-
+                
                 await (Task) handler.Handle(value, (dynamic)token);
+
+                // if(value == null)
+                // { _logger.LogWarning($"could not cast value : {result.Value} to data structure type : {handlerType.Value}"); }
+                // else
+                // { await (Task) handler.Handle(value, (dynamic)token); }
             }
         }
 
@@ -55,9 +60,8 @@ namespace Alamut.Kafka.SubscriberHandlers
 
             if (handler == null)
             {
-                var nullRefEx = new NullReferenceException(
+                throw new NullReferenceException(
                     $"<{_kafkaConfig.GroupId}> exception: no handler found for type <{handlerType}>");
-                throw nullRefEx;
             }
 
             return handler;

@@ -12,8 +12,9 @@ namespace Alamut.Kafka.SubscriberHandlers
             TopicHandlers = new Dictionary<string, KeyValuePair<Type,Type>>();
         }
 
-        public static IServiceCollection RegisterSubscriberHandler<TSubscriber, TSubscriberDataStructure>
-            (this IServiceCollection services, string topic) where TSubscriber : class
+        public static IServiceCollection RegisterSubscriberHandler<TSubscriber, TSubscriberDataStructure>(
+            this IServiceCollection services, string topic) 
+            where TSubscriber : class
         {
             if (string.IsNullOrEmpty(topic)) { throw new ArgumentNullException(nameof(topic)); }
             

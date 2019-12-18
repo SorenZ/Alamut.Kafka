@@ -4,4 +4,9 @@ namespace Alamut.Kafka.Models
     {
         public string Bar { get; set; }
     }
+
+    public class WrongModel
+    {
+        public string UnknownName { get; set; }
+    }
 }

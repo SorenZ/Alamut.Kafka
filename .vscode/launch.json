@@ -8,7 +8,7 @@
             "name": "Alamut.Kafka.Consumer",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build",
+            //"preLaunchTask": "build",
             "program": "${workspaceFolder}/samples/Alamut.Kafka.Consumer/bin/Debug/netcoreapp2.2/Alamut.Kafka.Consumer.dll",
             "args": [],
             "cwd": "${workspaceFolder}/samples/Alamut.Kafka.Consumer",
