@@ -6,9 +6,9 @@ using Alamut.Kafka.Models;
 
 namespace Alamut.Kafka.Consumer.Subscribers
 {
-    public class SendSmsGeneric : ISubscriber<Foo>
+    public class SendSmsGeneric : ISubscriber<FooMessage>
     {
-        public Task Handle(Foo message, CancellationToken token)
+        public Task Handle(FooMessage message, CancellationToken token)
         {
             Console.WriteLine($"Received message { message.Bar }");
 

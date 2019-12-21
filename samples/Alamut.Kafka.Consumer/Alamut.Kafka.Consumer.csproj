@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <PackageReference Include="Alamut.AspNet" Version="2.2.2" />
-    <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.AspNetCore.App" />    
   </ItemGroup>
 
   <ItemGroup>

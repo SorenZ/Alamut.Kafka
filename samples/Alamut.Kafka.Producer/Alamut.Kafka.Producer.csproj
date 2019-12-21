@@ -4,6 +4,10 @@
     <ProjectReference Include="..\..\src\Alamut.Kafka\Alamut.Kafka.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Alamut.Helpers" Version="3.2.1" />
+  </ItemGroup>
+
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.2</TargetFramework>

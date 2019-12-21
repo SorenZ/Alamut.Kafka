@@ -1,19 +1,22 @@
 namespace Alamut.Kafka.Models
 {
-    public class Message
+    public class Message : IMessage
     {
-        internal Message() {} // default constructor for Json DeSerialization  
-        public Message(object data)
-        {
-            this.Data = data;
-        }
-        public Message(object data, string eventName)
-        {
-            Data = data;
-            EventName = eventName;
-        }
-
+        public string Id { get; set; }
         public string EventName { get; set; }
         public object Data { get; set; }
+    }
+
+    public class Message<T> : IMessage
+    {
+        public string Id { get; set; }
+        public string EventName { get; set; }
+        public T Data { get; set; }
+    }
+
+     public interface IMessage
+    {
+        string Id { get; set; }
+        string EventName { get; set; }
     }
 }

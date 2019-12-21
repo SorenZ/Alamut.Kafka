@@ -9,4 +9,12 @@ namespace Alamut.Kafka.Models
     {
         public string UnknownName { get; set; }
     }
+
+    public class FooMessage : IMessage
+    {
+        public string Id { get; set; }
+        public string EventName { get; set; }
+        public string Bar { get; set; }
+        
+    }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Alamut.Helpers.DomainDriven;
 using Alamut.Kafka.Contracts;
 using Alamut.Kafka.Models;
 
@@ -16,8 +17,14 @@ namespace Alamut.Kafka.Producer
             while (true)
             {
                 var message = Console.ReadLine();
-                var dynamicMessage = new Foo
+                // var dynamicMessage = new Foo
+                // {
+                //     Bar = message
+                // };
+                var dynamicMessage = new FooMessage
                 {
+                    Id = new IdGenerator().GetNewId(),
+                    EventName = "Alamut.Foo.Create",
                     Bar = message
                 };
                 await publisher.Publish("mobin-soft", dynamicMessage);
