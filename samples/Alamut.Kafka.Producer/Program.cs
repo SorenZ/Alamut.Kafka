@@ -23,7 +23,7 @@ namespace Alamut.Kafka.Producer
                 // };
                 var dynamicMessage = new FooMessage
                 {
-                    Id = new IdGenerator().GetNewId(),
+                    Id = IdGenerator.GetNewId(),
                     EventName = "Alamut.Foo.Create",
                     Bar = message
                 };
