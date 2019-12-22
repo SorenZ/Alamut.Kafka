@@ -17,19 +17,23 @@ namespace Alamut.Kafka.SubscriberHandlers
         private readonly IServiceProvider _serviceProvider;
         private readonly ILogger _logger;
         private readonly KafkaConfig _kafkaConfig;
+        private readonly SubscriberBinding _binding;
+
         
         public GenericSubscriberHandler(IServiceProvider serviceProvider,
         ILogger<ISubscriberHandler> logger,
-        KafkaConfig kafkaConfig)
+        KafkaConfig kafkaConfig,
+        SubscriberBinding binding)
         {
             _kafkaConfig = kafkaConfig;
             _serviceProvider = serviceProvider;
             _logger = logger;
+            _binding = binding;
         }
 
         public async Task HandleMessage(ConsumeResult<Ignore, string> result, CancellationToken token)
         {
-            var isTopicHandlerAvailable = KafkaSubscriberRegistrationExtensions.TopicHandlers.TryGetValue(result.Topic, out var handlerType);
+            var isTopicHandlerAvailable = _binding.GenericTopicHandlers.TryGetValue(result.Topic, out var handlerType);
             if (!isTopicHandlerAvailable)
             {
                 _logger.LogWarning($"<{_kafkaConfig.GroupId}> received message on topic <{result.Topic}>, but there is no handler registered for topic.");

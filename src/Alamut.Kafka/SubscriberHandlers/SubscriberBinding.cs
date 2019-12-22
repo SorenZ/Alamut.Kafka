@@ -6,6 +6,8 @@ namespace Alamut.Kafka.SubscriberHandlers
     public class SubscriberBinding 
     {
         public IDictionary<string, Type> TopicHandlers { get; private set; } = new Dictionary<string, Type>();
+        public IDictionary<string, KeyValuePair<Type,Type>> GenericTopicHandlers { get; internal set; }
+            = new Dictionary<string, KeyValuePair<Type,Type>>();
 
         public SubscriberBinding RegisterTopicHandler<TSubscriber>(string topic)
         {
@@ -15,7 +17,7 @@ namespace Alamut.Kafka.SubscriberHandlers
 
             return this;
         }
-
+        
     }
 
 
