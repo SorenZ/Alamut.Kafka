@@ -56,9 +56,9 @@ namespace Alamut.Kafka.Consumer
 
             // --------------<( Generic handler)>---------------------------- 
             services.AddSingleton<ISubscriberHandler, GenericSubscriberHandler>();
-            var binding = new SubscriberBinding();
-            services.RegisterSubscriberHandler<SendSmsGeneric, FooMessage>("mobin-soft", binding);
-            services.AddSingleton(_ => binding);
+            services.AddSingleton(_ => new SubscriberBinding()
+                .RegisterTopicHandler<SendSmsGeneric,FooMessage>("mobin-soft"));
+            services.AddScoped<SendSmsGeneric>();
             // -----------------------------------------------------------------
 
 

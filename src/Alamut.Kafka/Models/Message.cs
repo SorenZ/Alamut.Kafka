@@ -14,7 +14,7 @@ namespace Alamut.Kafka.Models
         public T Data { get; set; }
     }
 
-     public interface IMessage
+    public interface IMessage
     {
         string Id { get; set; }
         string EventName { get; set; }

@@ -8,14 +8,13 @@ namespace Alamut.Kafka.Consumer.Subscribers
 {
     public class SendSmsGeneric : ISubscriber<FooMessage>
     {
-        public Task Handle(FooMessage message, CancellationToken token)
+        public async Task Handle(FooMessage message, CancellationToken token)
         {
-            Console.WriteLine($"Received message { message.Bar }");
+            Console.WriteLine($"Received message <{ message.Bar }>");
 
-            if(message.Bar == "item2")
-            { throw new Exception("test item 2 exception");}
+            // await Task.Delay(TimeSpan.FromSeconds(20));
 
-            return Task.CompletedTask;
+            // Console.WriteLine($"Processed message <{ message.Bar }>");
         }
     }
 }

@@ -17,6 +17,15 @@ namespace Alamut.Kafka.SubscriberHandlers
 
             return this;
         }
+
+        public SubscriberBinding RegisterTopicHandler<TSubscriber, TSubscriberDataStructure>(string topic)
+        {
+            if (string.IsNullOrEmpty(topic)) { throw new ArgumentNullException(nameof(topic)); }
+
+            this.GenericTopicHandlers[topic] = new KeyValuePair<Type, Type>(typeof(TSubscriber),typeof(TSubscriberDataStructure));
+
+            return this;
+        }
         
     }
 
