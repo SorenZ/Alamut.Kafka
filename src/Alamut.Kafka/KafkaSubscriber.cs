@@ -1,26 +1,26 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Alamut.Kafka.Models;
 using Alamut.Kafka.SubscriberHandlers;
+
 using Confluent.Kafka;
+
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace Alamut.Kafka
 {
-    public class KafkaService : BackgroundService
+    public class KafkaSubscriber : BackgroundService
     {
         internal const int commitPeriod = 5;
-        internal readonly ILogger<KafkaService> _logger;
+        internal readonly ILogger<KafkaSubscriber> _logger;
         internal readonly KafkaConfig _kafkaConfig;
         internal readonly ISubscriberHandler _handler;
 
 
-        public KafkaService(ILogger<KafkaService> logger,
+        public KafkaSubscriber(ILogger<KafkaSubscriber> logger,
         KafkaConfig kafkaConfig,
         ISubscriberHandler handler)
         {
@@ -52,11 +52,11 @@ namespace Alamut.Kafka
             // (including non-null data).
             var consumer = new ConsumerBuilder<Ignore, string>(config)
                 // Note: All handlers are called on the main .Consume thread.
-                .SetErrorHandler((_, e) => Console.WriteLine($"Error: {e.Reason}"))
+                .SetErrorHandler((_, e) => _logger.LogError($"Error: {e.Reason}"))
                 // .SetStatisticsHandler((_, json) => Console.WriteLine($"Statistics: {json}"))
                 .SetPartitionsAssignedHandler((c, partitions) =>
                 {
-                    Console.WriteLine($"Assigned partitions: [{string.Join(", ", partitions)}]");
+                    _logger.LogInformation($"Assigned partitions: [{string.Join(", ", partitions)}]");
                     // possibly manually specify start offsets or override the partition assignment provided by
                     // the consumer group by returning a list of topic/partition/offsets to assign to, e.g.:
                     // 
@@ -64,7 +64,7 @@ namespace Alamut.Kafka
                 })
                 .SetPartitionsRevokedHandler((c, partitions) =>
                 {
-                    Console.WriteLine($"Revoking assignment: [{string.Join(", ", partitions)}]");
+                    _logger.LogInformation($"Revoking assignment: [{string.Join(", ", partitions)}]");
                 })
                 .Build();
 
@@ -87,7 +87,7 @@ namespace Alamut.Kafka
 
                         if (consumeResult.IsPartitionEOF)
                         {
-                            Console.WriteLine(
+                            _logger.LogInformation(
                                 $"Reached end of topic {consumeResult.Topic}, partition {consumeResult.Partition}, offset {consumeResult.Offset}.");
 
                             continue;
@@ -111,13 +111,13 @@ namespace Alamut.Kafka
                             }
                             catch (KafkaException e)
                             {
-                                Console.WriteLine($"Commit error: {e.Error.Reason}");
+                                _logger.LogError($"Commit error: {e.Error.Reason}");
                             }
                         }
                     }
                     catch (ConsumeException e)
                     {
-                        Console.WriteLine($"Consume error: {e.Error.Reason}");
+                        _logger.LogError($"Consume error: {e.Error.Reason}");
                     }
                     catch (Exception e)
                     {
@@ -127,7 +127,7 @@ namespace Alamut.Kafka
             }
             catch (OperationCanceledException)
             {
-                Console.WriteLine("Closing consumer.");
+                _logger.LogWarning("Closing consumer.");
                 consumer.Close();
             }
         }

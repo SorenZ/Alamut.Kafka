@@ -28,7 +28,7 @@ namespace Alamut.Kafka.Consumer
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddPoco<KafkaConfig>(Configuration);
-            services.AddHostedService<KafkaService>();
+            services.AddHostedService<KafkaSubscriber>();
 
             // --------------<( string handler)>---------------------------- 
             // services.AddSingleton<ISubscriberHandler, StringSubscriberHandler>();
