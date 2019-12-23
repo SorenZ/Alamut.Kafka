@@ -36,7 +36,7 @@ namespace Alamut.Kafka.Producer
                     EventName = "Alamut.Foo.Create",
                     Bar = message
                 };
-                await publisher.Publish("mobin-soft", dynamicMessage);
+                await publisher.Publish("mobin-net", dynamicMessage);
                 // await publisher.Publish("mobin-soft", "send sms to 0912");
             }
         }

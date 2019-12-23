@@ -51,16 +51,7 @@ namespace Alamut.Kafka.SubscriberHandlers
                 
                 await (Task) handler.Handle(value, (dynamic)token);    
 
-                // try
-                // {
-                //     await (Task) handler.Handle(value, (dynamic)token);    
-                // }
-                // catch (System.Exception)
-                // {            
-                // }
-                
-
-                // if(value == null)
+                // if(value == null) // impossible to get null value here
                 // { _logger.LogWarning($"could not cast value : {result.Value} to data structure type : {handlerType.Value}"); }
                 // else
                 // { await (Task) handler.Handle(value, (dynamic)token); }

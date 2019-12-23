@@ -14,21 +14,20 @@ namespace Alamut.Kafka
 {
     public class KafkaSubscriber : BackgroundService
     {
-        internal const int commitPeriod = 5;
-        internal readonly ILogger<KafkaSubscriber> _logger;
-        internal readonly KafkaConfig _kafkaConfig;
-        internal readonly ISubscriberHandler _handler;
+        private const int commitPeriod = 5;
+        private readonly ILogger _logger;
+        private readonly KafkaConfig _kafkaConfig;
+        private readonly ISubscriberHandler _handler;
 
 
-        public KafkaSubscriber(ILogger<KafkaSubscriber> logger,
+        public KafkaSubscriber(ILoggerFactory loggerFactory,
         KafkaConfig kafkaConfig,
         ISubscriberHandler handler)
         {
             _kafkaConfig = kafkaConfig;
-            _logger = logger;
+            _logger = loggerFactory.CreateLogger(nameof(KafkaSubscriber) + "-" + kafkaConfig.GroupId);
             _handler = handler;
         }
-
 
         protected override Task ExecuteAsync(CancellationToken cancellationToken)
         {

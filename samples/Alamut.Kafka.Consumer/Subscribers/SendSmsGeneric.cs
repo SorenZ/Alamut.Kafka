@@ -12,9 +12,9 @@ namespace Alamut.Kafka.Consumer.Subscribers
         {
             Console.WriteLine($"Received message <{ message.Bar }>");
 
-            // await Task.Delay(TimeSpan.FromSeconds(20));
+            //await Task.Delay(TimeSpan.FromSeconds(10));
 
-            // Console.WriteLine($"Processed message <{ message.Bar }>");
+            //Console.WriteLine($"Processed message <{ message.Bar }>");
         }
     }
 }

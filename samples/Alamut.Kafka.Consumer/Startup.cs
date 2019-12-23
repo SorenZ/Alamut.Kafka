@@ -28,7 +28,11 @@ namespace Alamut.Kafka.Consumer
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddPoco<KafkaConfig>(Configuration);
-            services.AddHostedService<KafkaSubscriber>();
+            //services.AddHostedService<KafkaSubscriber>();
+            services.AddNewHostedSubscriber("group1","mobin-net");
+            //services.AddNewHostedSubscriber("group2","mobin-net");
+            //services.AddNewHostedSubscriber("group3","mobin-net");
+            
 
             // --------------<( string handler)>---------------------------- 
             // services.AddSingleton<ISubscriberHandler, StringSubscriberHandler>();
@@ -57,7 +61,7 @@ namespace Alamut.Kafka.Consumer
             // --------------<( Generic handler)>---------------------------- 
             services.AddSingleton<ISubscriberHandler, GenericSubscriberHandler>();
             services.AddSingleton(_ => new SubscriberBinding()
-                .RegisterTopicHandler<SendSmsGeneric,FooMessage>("mobin-soft"));
+                .RegisterTopicHandler<SendSmsGeneric,FooMessage>("mobin-net"));
             services.AddScoped<SendSmsGeneric>();
             // -----------------------------------------------------------------
 
