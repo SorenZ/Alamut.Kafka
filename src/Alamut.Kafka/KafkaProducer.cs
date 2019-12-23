@@ -1,9 +1,13 @@
 using System;
 using System.Threading.Tasks;
+
 using Alamut.Kafka.Contracts;
 using Alamut.Kafka.Models;
 
 using Confluent.Kafka;
+
+using Microsoft.Extensions.Logging;
+
 using Newtonsoft.Json;
 
 namespace Alamut.Kafka
@@ -11,21 +15,26 @@ namespace Alamut.Kafka
     public class KafkaProducer : IPublisher
     {
         private readonly IProducer<Null, string> _producer;
+        private readonly ILogger<KafkaProducer> _logger;
 
-        public KafkaProducer(KafkaConfig kafkaConfig)
+        public KafkaProducer(KafkaConfig kafkaConfig, ILogger<KafkaProducer> logger)
         {
-            var config = new ProducerConfig { BootstrapServers = kafkaConfig.BootstrapServers 
-                ?? throw new ArgumentNullException(nameof(kafkaConfig.BootstrapServers)) };
-            
-             _producer = new ProducerBuilder<Null,string>(config).Build();
+            _logger = logger;
+            var config = new ProducerConfig
+            {
+                BootstrapServers = kafkaConfig.BootstrapServers
+                ?? throw new ArgumentNullException(nameof(kafkaConfig.BootstrapServers))
+            };
+
+            _producer = new ProducerBuilder<Null, string>(config).Build();
         }
 
         public async Task Publish(string topic, string message)
         {
-            if (message == null) { throw new ArgumentNullException(nameof(message));}
+            if (message == null) { throw new ArgumentNullException(nameof(message)); }
             if (string.IsNullOrEmpty(topic)) { throw new ArgumentNullException(nameof(topic)); }
 
-             try
+            try
             {
                 // var serializedMessage = JsonConvert.SerializeObject(message);
 
@@ -34,13 +43,13 @@ namespace Alamut.Kafka
                 // expense of low throughput).
                 var deliveryReport = await _producer.ProduceAsync(
                     topic,
-                    new Message<Null, string> {Value = message});
+                    new Message<Null, string> { Value = message });
 
-                Console.WriteLine($"delivered to: {deliveryReport.TopicPartitionOffset}");
+                _logger.LogTrace($"delivered to: {deliveryReport.TopicPartitionOffset}");
             }
             catch (ProduceException<Null, string> e)
             {
-                Console.WriteLine($"failed to deliver message: {e.Message} [{e.Error.Code}]");
+                _logger.LogError($"failed to deliver message: {e.Message} [{e.Error.Code}]");
                 throw;
             }
 
