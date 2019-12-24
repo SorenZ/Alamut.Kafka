@@ -12,6 +12,10 @@ using Microsoft.Extensions.Logging;
 
 namespace Alamut.Kafka
 {
+    /// <summary>
+    /// implements Kafka subscriber as a background service 
+    /// it depends on KafkaConfig and ISubscriberHandler
+    /// </summary>
     public class KafkaSubscriber : BackgroundService
     {
         private const int commitPeriod = 5;
@@ -86,7 +90,7 @@ namespace Alamut.Kafka
 
                         if (consumeResult.IsPartitionEOF)
                         {
-                            _logger.LogInformation(
+                            _logger.LogTrace(
                                 $"Reached end of topic {consumeResult.Topic}, partition {consumeResult.Partition}, offset {consumeResult.Offset}.");
 
                             continue;

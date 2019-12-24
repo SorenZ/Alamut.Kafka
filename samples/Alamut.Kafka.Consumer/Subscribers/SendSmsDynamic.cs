@@ -5,7 +5,7 @@ using Alamut.Kafka.Contracts;
 
 namespace Alamut.Kafka.Consumer.Subscribers
 {
-    public class SendSmsDynamic : IDynamicSubscriber
+    public class SendSmsDynamic : IDynamicMessageHandler
     {
         public Task Handle(dynamic message, CancellationToken token)
         {

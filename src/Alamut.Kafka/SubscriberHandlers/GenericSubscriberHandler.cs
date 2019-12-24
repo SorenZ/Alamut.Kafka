@@ -1,17 +1,22 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Alamut.Kafka.Contracts;
+
 using Alamut.Kafka.Models;
+
 using Confluent.Kafka;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 
 namespace Alamut.Kafka.SubscriberHandlers
 {
+    /// <summary>
+    /// provides a generics subscriber handler for Kafka consumer
+    /// </summary>
     public class GenericSubscriberHandler:  ISubscriberHandler
     {
         private readonly IServiceProvider _serviceProvider;

@@ -7,7 +7,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Alamut.Kafka.Consumer.Subscribers
 {
-    public class SendSmsJObject : IJObjectSubscriber
+    public class SendSmsJObject : IJObjectMessageHandler
     {
         public Task Handle(JObject message, CancellationToken token)
         {

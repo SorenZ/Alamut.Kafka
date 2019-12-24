@@ -51,7 +51,7 @@ namespace Alamut.Kafka.SubscriberHandlers
             }
         }
 
-        private IDynamicSubscriber GetHandler(IServiceScope scope, Type handlerType)
+        private IDynamicMessageHandler GetHandler(IServiceScope scope, Type handlerType)
         {
             var handler = scope.ServiceProvider.GetService(handlerType);
 
@@ -61,12 +61,12 @@ namespace Alamut.Kafka.SubscriberHandlers
                 throw nullRefEx;
             }
 
-            if (handler is IDynamicSubscriber eventHandler)
+            if (handler is IDynamicMessageHandler eventHandler)
             {
                 return eventHandler;
             }
 
-            var castEx = new InvalidCastException($"<{_kafkaConfig.GroupId}> exception: handler <{handlerType}> not of type <{typeof(IDynamicSubscriber)}>");
+            var castEx = new InvalidCastException($"<{_kafkaConfig.GroupId}> exception: handler <{handlerType}> not of type <{typeof(IDynamicMessageHandler)}>");
             throw castEx;
         }
     }

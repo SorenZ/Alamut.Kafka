@@ -6,7 +6,7 @@ using Alamut.Kafka.Models;
 
 namespace Alamut.Kafka.Consumer.Subscribers
 {
-    public class SendSmsGeneric : ISubscriber<FooMessage>
+    public class SendSmsGeneric : IMessageHandler<FooMessage>
     {
         public async Task Handle(FooMessage message, CancellationToken token)
         {

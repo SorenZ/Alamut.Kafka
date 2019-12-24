@@ -51,7 +51,7 @@ namespace Alamut.Kafka.SubscriberHandlers
             }
         }
 
-        private IJObjectSubscriber GetHandler(IServiceScope scope, Type handlerType)
+        private IJObjectMessageHandler GetHandler(IServiceScope scope, Type handlerType)
         {
             var handler = scope.ServiceProvider.GetService(handlerType);
 
@@ -62,13 +62,13 @@ namespace Alamut.Kafka.SubscriberHandlers
                 throw nullRefEx;
             }
 
-            if (handler is IJObjectSubscriber eventHandler)
+            if (handler is IJObjectMessageHandler eventHandler)
             {
                 return eventHandler;
             }
 
             var castEx = new InvalidCastException(
-                $"<{_kafkaConfig.GroupId}> exception: handler <{handlerType}> not of type <{typeof(IJObjectSubscriber)}>");
+                $"<{_kafkaConfig.GroupId}> exception: handler <{handlerType}> not of type <{typeof(IJObjectMessageHandler)}>");
             throw castEx;
         }
     }
