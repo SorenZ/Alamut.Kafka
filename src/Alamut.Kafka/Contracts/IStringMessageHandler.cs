@@ -1,6 +1,5 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using Alamut.Kafka.Models;
 
 namespace Alamut.Kafka.Contracts
 {

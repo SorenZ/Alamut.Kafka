@@ -1,3 +1,5 @@
+using Alamut.Abstractions.Messaging;
+
 namespace Alamut.Kafka.Models
 {
     public class Foo
