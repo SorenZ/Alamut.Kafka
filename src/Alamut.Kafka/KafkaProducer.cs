@@ -33,12 +33,6 @@ namespace Alamut.Kafka
             _producer = new ProducerBuilder<Null, string>(config).Build();
         }
 
-        /// <summary>
-        /// publish message to specified topic 
-        /// </summary>
-        /// <param name="topic"></param>
-        /// <param name="message"></param>
-        /// <returns></returns>
         public async Task Publish(string topic, string message)
         {
             if (message == null) { throw new ArgumentNullException(nameof(message)); }
@@ -66,12 +60,6 @@ namespace Alamut.Kafka
 
         }
 
-        /// <summary>
-        /// publish message to specified topic 
-        /// </summary>
-        /// <param name="topic"></param>
-        /// <param name="message"></param>
-        /// <returns></returns>
         public async Task Publish(string topic, object message)
         {
             if (message == null) { throw new ArgumentNullException(nameof(message)); }
