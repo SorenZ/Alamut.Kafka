@@ -30,13 +30,13 @@ namespace Alamut.Kafka.Producer
                 // {
                 //     Bar = message
                 // };
-                var dynamicMessage = new FooMessage
+                var typedMessage = new FooMessage
                 {
-                    Id = IdGenerator.GetNewId(),
+                    // Id = IdGenerator.GetNewId(), // generate automatically in publisher
                     EventName = "Alamut.Foo.Create",
                     Bar = message
                 };
-                await publisher.Publish("mobin-net", dynamicMessage);
+                await publisher.Publish("mobin-net", typedMessage);
                 // await publisher.Publish("mobin-soft", "send sms to 0912");
             }
         }

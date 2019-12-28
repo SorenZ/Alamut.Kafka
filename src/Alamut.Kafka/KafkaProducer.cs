@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
-
+using Alamut.Abstractions.Messaging;
+using Alamut.Helpers.DomainDriven;
 using Alamut.Kafka.Contracts;
 using Alamut.Kafka.Models;
 
@@ -73,6 +74,18 @@ namespace Alamut.Kafka
         /// <returns></returns>
         public async Task Publish(string topic, object message)
         {
+            if (message == null) { throw new ArgumentNullException(nameof(message)); }
+
+            await Publish(topic, JsonConvert.SerializeObject(message));
+        }
+
+        public async Task Publish(string topic, IMessage message)
+        {
+            if (message == null) { throw new ArgumentNullException(nameof(message)); }
+
+            if(message.Id == null)
+            { message.Id = IdGenerator.GetNewId(); }
+
             await Publish(topic, JsonConvert.SerializeObject(message));
         }
     }
