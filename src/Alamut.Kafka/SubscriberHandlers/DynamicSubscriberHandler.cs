@@ -1,11 +1,15 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Alamut.Kafka.Contracts;
+
+using Alamut.Abstractions.Messaging;
 using Alamut.Kafka.Models;
+
 using Confluent.Kafka;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+
 using Newtonsoft.Json;
 
 namespace Alamut.Kafka.SubscriberHandlers

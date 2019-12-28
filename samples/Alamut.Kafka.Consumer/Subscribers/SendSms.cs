@@ -1,7 +1,8 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Alamut.Kafka.Contracts;
+
+using Alamut.Abstractions.Messaging;
 
 namespace Alamut.Kafka.Consumer.Subscribers
 {

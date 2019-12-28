@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Alamut.Helpers.DomainDriven;
-using Alamut.Kafka.Contracts;
+using Alamut.Abstractions.Messaging;
 using Alamut.Kafka.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
