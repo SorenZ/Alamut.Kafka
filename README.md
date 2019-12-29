@@ -70,7 +70,9 @@ await publisher.Publish("alamut-soft", typedMessage);
 
 **Register Producer**  
 If you want to get IPublisher through DI you should register it in project Startup:  
-`services.AddSingleton<IPublisher, KafkaProducer>();`
+```csharp
+services.AddSingleton<IPublisher, KafkaProducer>();
+```
 
 ***
 
