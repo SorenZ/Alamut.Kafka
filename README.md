@@ -1,6 +1,6 @@
 # Alamut.Kafka  
-## The purpose of this library is to easy to use Apache.Kafka in Dotnet (and ASP.NET) application on top of Dotnet Core Dependency Injection infrastructure.
-## actually it's a wrapper on [Confluent's Apache Kafka .NET client](https://github.com/confluentinc/confluent-kafka-dotnet)
+The purpose of this library is to easy to use Apache.Kafka in Dotnet (Console, ASP.NET, Web API) application on top of Dotnet Core Dependency Injection infrastructure.
+actually it's a wrapper on [Confluent's Apache Kafka .NET client](https://github.com/confluentinc/confluent-kafka-dotnet)
 
 ***
 
@@ -9,7 +9,7 @@ You should install [Alamut.Kafka with NuGet](https://www.nuget.org/packages/Alam
 
     Install-Package Alamut.Kafka
     
-Or via the .NET Core command line interface:
+Or via the .NET Core command-line interface:
 
     dotnet add package Alamut.Kafka
 
@@ -43,6 +43,33 @@ The publisher could publish a message in a variety types of data structure:
 * [IMessage](https://github.com/SorenZ/Alamut.Abstractions/blob/master/src/Alamut.Abstractions/Messaging/IMessage.cs) 
 
 **Producer Sample**
+```charp
+IPublisher publisher = new KafkaProducer(*/dependencies provided by DI/*);
+
+// string message
+await publisher.Publish("alamut-soft", "a string message");
+
+// object message
+var objectMessage = new Foo
+{
+    Bar = message
+};
+await publisher.Publish("mobin-net", objectMessage);
+
+// IMessage message
+var typedMessage = new FooMessage // inherited from IMessage
+{
+    // Id = IdGenerator.GetNewId(), // generate automatically in publisher
+    EventName = "Alamut.Foo.Create",
+    Bar = message
+};
+await publisher.Publish("mobin-net", typedMessage);
+```
+
+**Register Producer**
+If you want to riche IPublisher through DI you should register it in project Startup:
+`services.AddSingleton<IPublisher, KafkaProducer>();`
 
 
-**Setup Producer**
+
+
