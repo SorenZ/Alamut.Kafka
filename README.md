@@ -1,6 +1,6 @@
 # Alamut.Kafka  
-The purpose of this library is to easy to use Apache.Kafka in Dotnet (Console, ASP.NET, Web API) application on top of Dotnet Core Dependency Injection infrastructure.
-actually it's a wrapper on [Confluent's Apache Kafka .NET client](https://github.com/confluentinc/confluent-kafka-dotnet)
+The purpose of this library is to easy to use Apache.Kafka in Dotnet (Console, ASP.NET, Web API) application on top of Dotnet Core Dependency Injection infrastructure.  
+Actually it's a wrapper of [Confluent's Apache Kafka .NET client](https://github.com/confluentinc/confluent-kafka-dotnet)
 
 ***
 
@@ -45,8 +45,8 @@ The publisher could publish a message in a variety types of data structure:
 * [IMessage](https://github.com/SorenZ/Alamut.Abstractions/blob/master/src/Alamut.Abstractions/Messaging/IMessage.cs) 
 
 **Producer Sample**
-```charp
-IPublisher publisher = new KafkaProducer(*/dependencies provided by DI/*);
+```csharp
+IPublisher publisher = new KafkaProducer(*/dependencies provided by DI*/);
 
 // string message
 await publisher.Publish("alamut-soft", "a string message");
@@ -56,7 +56,7 @@ var objectMessage = new Foo
 {
     Bar = message
 };
-await publisher.Publish("mobin-net", objectMessage);
+await publisher.Publish("alamut-soft", objectMessage);
 
 // IMessage message
 var typedMessage = new FooMessage // inherited from IMessage
@@ -65,7 +65,7 @@ var typedMessage = new FooMessage // inherited from IMessage
     EventName = "Alamut.Foo.Create",
     Bar = message
 };
-await publisher.Publish("mobin-net", typedMessage);
+await publisher.Publish("alamut-soft", typedMessage);
 ```
 
 **Register Producer**  
