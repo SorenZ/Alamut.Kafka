@@ -34,6 +34,8 @@ services.AddPoco<KafkaConfig>(Configuration);
 
 [comprehensive samples](https://github.com/SorenZ/Alamut.Kafka/blob/master/samples/Alamut.Kafka.Consumer/Startup.cs)
 
+***
+
 ### Producer
 Producer publish a message into specified topic.
 We ususally use [IPublisher](https://github.com/SorenZ/Alamut.Abstractions/blob/master/src/Alamut.Abstractions/Messaging/IPublisher.cs) as a producer in our application.
@@ -66,9 +68,14 @@ var typedMessage = new FooMessage // inherited from IMessage
 await publisher.Publish("mobin-net", typedMessage);
 ```
 
-**Register Producer**
-If you want to riche IPublisher through DI you should register it in project Startup:
+**Register Producer**  
+If you want to get IPublisher through DI you should register it in project Startup:  
 `services.AddSingleton<IPublisher, KafkaProducer>();`
+
+***
+
+### Consumer  
+
 
 
 
