@@ -1,5 +1,8 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
-
+using System.Reflection;
+using Alamut.Abstractions.Messaging;
 using Alamut.Kafka.Models;
 using Alamut.Kafka.SubscriberHandlers;
 
@@ -44,12 +47,90 @@ namespace Alamut.Kafka
         public static IServiceCollection RegisterGenericSubscriberHandler(this IServiceCollection services)
             => services.AddSingleton<ISubscriberHandler, GenericSubscriberHandler>();
 
-        public static IServiceCollection RegisterMessageHandler(this IServiceCollection services)
+        public static IServiceCollection RegisterMessageHandlers(this IServiceCollection services, params Assembly[] assemblies)
         {
-            
+            var subscriberBinding = new SubscriberBinding();
 
+            // var iMessageHandlerType = typeof(IMessageHandler<>);
+            // var types = assemblies
+            //     .SelectMany(s => s.GetTypes())
+            //     .Where(p => iMessageHandlerType.IsAssignableFrom(p) && p.IsClass);
+
+            var types = GetClassesImplementingAnInterface(assemblies[0], typeof(IMessageHandler<>));
+
+            foreach (var messageHandlerType in types)
+            {
+                var messageType = messageHandlerType.GetInterfaces()[0].GetGenericArguments()[0];
+                var topics = new []{"mobin-net"};
+
+                subscriberBinding.RegisterTopicHandler(messageHandlerType, messageType, topics);
+                
+                services.AddScoped(messageHandlerType);
+
+            }
+
+            services.AddSingleton(subscriberBinding);
 
             return services;
+        }
+
+        public static IList<Type> GetClassesImplementingAnInterface(Assembly assemblyToScan, Type implementedInterface)
+        {
+            // if (implementedInterface == null || !implementedInterface.IsInterface)
+            //     return Tuple.Create(false, (IList<Type>)null);
+
+            IEnumerable<Type> typesInTheAssembly;
+
+            try
+            {
+                typesInTheAssembly = assemblyToScan.GetTypes();
+            }
+            catch (ReflectionTypeLoadException e)
+            {
+                typesInTheAssembly = e.Types.Where(t => t != null);
+            }
+
+            IList<Type> classesImplementingInterface = new List<Type>();
+
+            // if the interface is a generic interface
+            if (implementedInterface.IsGenericType)
+            {
+                foreach (var typeInTheAssembly in typesInTheAssembly)
+                {
+                    if (typeInTheAssembly.IsClass)
+                    {
+                        var typeInterfaces = typeInTheAssembly.GetInterfaces();
+                        foreach (var typeInterface in typeInterfaces)
+                        {
+                            if (typeInterface.IsGenericType)
+                            {
+                                var typeGenericInterface = typeInterface.GetGenericTypeDefinition();
+                                var implementedGenericInterface = implementedInterface.GetGenericTypeDefinition();
+
+                                if (typeGenericInterface == implementedGenericInterface)
+                                {
+                                    classesImplementingInterface.Add(typeInTheAssembly);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                foreach (var typeInTheAssembly in typesInTheAssembly)
+                {
+                    if (typeInTheAssembly.IsClass)
+                    {
+                        // if the interface is a non-generic interface
+                        if (implementedInterface.IsAssignableFrom(typeInTheAssembly))
+                        {
+                            classesImplementingInterface.Add(typeInTheAssembly);
+                        }
+                    }
+                }
+            }
+            return classesImplementingInterface;
         }
 
     }

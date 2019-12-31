@@ -43,6 +43,18 @@ namespace Alamut.Kafka
 
             return this;
         }
+
+        public SubscriberBinding RegisterTopicHandler(Type typeMessageHandler, Type typeMessage, params string[] topics)
+        {
+            if (topics == null || !topics.Any()) { throw new ArgumentNullException(nameof(topics)); }
+
+            foreach (var topic in topics)
+            {
+                this.GenericTopicHandlers[topic] = new KeyValuePair<Type, Type>(typeMessageHandler,typeMessage);
+            }
+
+            return this;
+        }
         
     }
 

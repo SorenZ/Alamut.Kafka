@@ -59,16 +59,16 @@ namespace Alamut.Kafka.Consumer
             // -----------------------------------------------------------------
 
             // --------------<( Generic handler)>---------------------------- 
-            services.AddSingleton<ISubscriberHandler, GenericSubscriberHandler>();
+            // services.AddSingleton<ISubscriberHandler, GenericSubscriberHandler>();
             
-            services.AddSingleton(_ => new SubscriberBinding()
-                .RegisterTopicHandler<SendSmsGeneric,FooMessage>("mobin-net"));
-            services.AddScoped<SendSmsGeneric>();
+            // services.AddSingleton(_ => new SubscriberBinding()
+            //     .RegisterTopicHandler<SendSmsGeneric,FooMessage>("mobin-net"));
+            // services.AddScoped<SendSmsGeneric>();
             // -----------------------------------------------------------------
 
             // --------------<( Generic handler - DI Helpers)>------------------
             services.RegisterGenericSubscriberHandler();
-            
+            services.RegisterMessageHandlers(typeof(SendSmsGeneric).Assembly);
             // -----------------------------------------------------------------
 
         }
