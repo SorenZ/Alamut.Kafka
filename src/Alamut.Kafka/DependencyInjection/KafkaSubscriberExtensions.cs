@@ -40,5 +40,19 @@ namespace Alamut.Kafka
                     provider.GetRequiredService<ISubscriberHandler>());
             });
         }
+
+        public static IServiceCollection RegisterGenericSubscriberHandler(this IServiceCollection services)
+            => services.AddSingleton<ISubscriberHandler, GenericSubscriberHandler>();
+
+        public static IServiceCollection RegisterMessageHandler(this IServiceCollection services)
+        {
+            
+
+
+            return services;
+        }
+
     }
+
+
 }
