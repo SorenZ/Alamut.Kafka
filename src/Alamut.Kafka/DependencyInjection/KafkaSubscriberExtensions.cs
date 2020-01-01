@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+
 using Alamut.Abstractions.Messaging;
-using Alamut.Kafka.DependencyInjection;
 using Alamut.Kafka.Models;
 using Alamut.Kafka.SubscriberHandlers;
 
@@ -47,14 +47,29 @@ namespace Alamut.Kafka
             });
         }
 
-        public static IServiceCollection RegisterGenericSubscriberHandler(this IServiceCollection services)
-            => services.AddSingleton<ISubscriberHandler, GenericSubscriberHandler>();
 
+        /// <summary>
+        /// registers all MessageHandler in Assembly specified by type parameter
+        /// </summary>
+        /// <typeparam name="TMessageHandler">type of </typeparam>
+        /// <returns></returns>
+        public static IServiceCollection RegisterMessageHandlers<TMessageHandler>(this IServiceCollection services) 
+            // where TMessageHandler : IMessageHandler<>
+            => RegisterMessageHandlers(services, typeof(TMessageHandler).Assembly);
+
+        /// <summary>
+        /// register all MessageHandler in specified assemblies
+        /// map MessageHandler with their own Topic(s) 
+        /// register GenericSubscriberHandler
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="assemblies"></param>
+        /// <returns></returns>
         public static IServiceCollection RegisterMessageHandlers(this IServiceCollection services, params Assembly[] assemblies)
         {
             var subscriberBinding = new SubscriberBinding();
 
-            var types = GetClassesImplementingAnInterface(assemblies[0], typeof(IMessageHandler<>));
+            var types = GetClassesImplementingAnInterface(assemblies, typeof(IMessageHandler<>));
 
             foreach (var messageHandlerType in types)
             {
@@ -62,20 +77,20 @@ namespace Alamut.Kafka
                 var messageType = messageHandlerType.GetInterface(typeof(IMessageHandler<>).Name).GetGenericArguments()[0];
 
                 var topics = messageHandlerType.GetCustomAttribute<TopicsAttribute>()?.Topics 
-                    ?? throw new Exception("Topics attributes not defined for MessageHandler : " + messageHandlerType.Name);
+                    ?? throw new Exception($"{nameof(TopicsAttribute)} does not defined for MessageHandler : {messageHandlerType.Name}");
 
                 subscriberBinding.RegisterTopicHandler(messageHandlerType, messageType, topics);
                 
                 services.AddScoped(messageHandlerType);
-
             }
 
             services.AddSingleton(subscriberBinding);
+            services.AddSingleton<ISubscriberHandler, GenericSubscriberHandler>();
 
             return services;
         }
 
-        public static IList<Type> GetClassesImplementingAnInterface(Assembly assemblyToScan, Type implementedInterface)
+        private static IList<Type> GetClassesImplementingAnInterface(Assembly[] assembliesToScan, Type implementedInterface)
         {
             // if (implementedInterface == null || !implementedInterface.IsInterface)
             //     return Tuple.Create(false, (IList<Type>)null);
@@ -84,7 +99,9 @@ namespace Alamut.Kafka
 
             try
             {
-                typesInTheAssembly = assemblyToScan.GetTypes();
+                typesInTheAssembly = assembliesToScan
+                    .Select(s => s.GetTypes())
+                    .SelectMany(s => s);
             }
             catch (ReflectionTypeLoadException e)
             {

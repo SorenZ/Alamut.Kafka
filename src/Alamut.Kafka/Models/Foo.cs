@@ -17,6 +17,7 @@ namespace Alamut.Kafka.Models
         public string Id { get; set; }
         public string EventName { get; set; }
         public string Bar { get; set; }
-        
+        public bool AcknowledgeRequested { get; set;  }
+        public string AcknowledgeTopic { get; set;  }
     }
 }

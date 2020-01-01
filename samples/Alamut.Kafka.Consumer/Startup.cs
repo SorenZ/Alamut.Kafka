@@ -68,8 +68,8 @@ namespace Alamut.Kafka.Consumer
             // -----------------------------------------------------------------
 
             // --------------<( Generic handler - DI Helpers)>------------------
-            services.RegisterGenericSubscriberHandler();
             services.RegisterMessageHandlers(typeof(SendSmsGeneric).Assembly);
+            // services.RegisterMessageHandlers<SendSmsGeneric>();
             // -----------------------------------------------------------------
 
         }
