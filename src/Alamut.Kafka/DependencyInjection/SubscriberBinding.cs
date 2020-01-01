@@ -34,7 +34,8 @@ namespace Alamut.Kafka
         public SubscriberBinding RegisterTopicHandler<TMessageHandler, TMessage>(params string[] topics)
             where TMessageHandler : IMessageHandler<TMessage>
         {
-            if (topics == null || !topics.Any()) { throw new ArgumentNullException(nameof(topics)); }
+            if (topics == null || !topics.Any()) 
+                { throw new ArgumentNullException("Topics were not provided for MessageHandler : " + typeof(TMessageHandler).Name); }
 
             foreach (var topic in topics)
             {

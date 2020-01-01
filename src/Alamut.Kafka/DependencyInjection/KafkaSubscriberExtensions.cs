@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Alamut.Abstractions.Messaging;
+using Alamut.Kafka.DependencyInjection;
 using Alamut.Kafka.Models;
 using Alamut.Kafka.SubscriberHandlers;
 
@@ -59,8 +60,9 @@ namespace Alamut.Kafka
             {
                 // https://docs.microsoft.com/en-us/dotnet/api/system.type.getinterface
                 var messageType = messageHandlerType.GetInterface(typeof(IMessageHandler<>).Name).GetGenericArguments()[0];
-                
-                var topics = new []{"mobin-net"};
+
+                var topics = messageHandlerType.GetCustomAttribute<TopicsAttribute>()?.Topics 
+                    ?? throw new Exception("Topics attributes not defined for MessageHandler : " + messageHandlerType.Name);
 
                 subscriberBinding.RegisterTopicHandler(messageHandlerType, messageType, topics);
                 

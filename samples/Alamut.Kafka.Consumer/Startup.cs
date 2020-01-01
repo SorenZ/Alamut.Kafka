@@ -16,6 +16,7 @@ namespace Alamut.Kafka.Consumer
 {
     public class Startup
     {
+        public const string TestTopic = "mobin-net";
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
