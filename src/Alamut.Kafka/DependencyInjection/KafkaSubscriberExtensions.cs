@@ -36,6 +36,8 @@ namespace Alamut.Kafka
                 if(topics != null && topics.Any())
                 { config.Topics = topics; }
 
+                // TODO : check topics and groups for null and emptry
+
 
                 return new KafkaSubscriber(
                     provider.GetRequiredService<ILoggerFactory>(),
@@ -51,16 +53,13 @@ namespace Alamut.Kafka
         {
             var subscriberBinding = new SubscriberBinding();
 
-            // var iMessageHandlerType = typeof(IMessageHandler<>);
-            // var types = assemblies
-            //     .SelectMany(s => s.GetTypes())
-            //     .Where(p => iMessageHandlerType.IsAssignableFrom(p) && p.IsClass);
-
             var types = GetClassesImplementingAnInterface(assemblies[0], typeof(IMessageHandler<>));
 
             foreach (var messageHandlerType in types)
             {
-                var messageType = messageHandlerType.GetInterfaces()[0].GetGenericArguments()[0];
+                // https://docs.microsoft.com/en-us/dotnet/api/system.type.getinterface
+                var messageType = messageHandlerType.GetInterface(typeof(IMessageHandler<>).Name).GetGenericArguments()[0];
+                
                 var topics = new []{"mobin-net"};
 
                 subscriberBinding.RegisterTopicHandler(messageHandlerType, messageType, topics);
