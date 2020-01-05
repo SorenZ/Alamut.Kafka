@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Alamut.Abstractions.Messaging;
 using Alamut.AspNet.Configuration;
 using Alamut.Kafka.Consumer.Subscribers;
 using Alamut.Kafka.Models;
@@ -33,7 +34,7 @@ namespace Alamut.Kafka.Consumer
             services.AddNewHostedSubscriber("group1","mobin-net");
             //services.AddNewHostedSubscriber("group2","mobin-net");
             //services.AddNewHostedSubscriber("group3","mobin-net");
-            
+            services.AddScoped<IPublisher,KafkaProducer>();
 
             // --------------<( string handler)>---------------------------- 
             // services.AddSingleton<ISubscriberHandler, StringSubscriberHandler>();
