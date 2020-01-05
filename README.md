@@ -79,7 +79,7 @@ services.AddSingleton<IPublisher, KafkaProducer>();
 ### Consumer  
 Consumer subscribes to the specified topic(s) and works as a [Background Hosted Service](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/hosted-services).  
 
-Consumer automatically calls the classes that implemented [IMessageHandler<TMessage>)[https://github.com/SorenZ/Alamut.Abstractions/blob/master/src/Alamut.Abstractions/Messaging/IMessageHandler%5BTMessage%5D.cs] interface and decorated with [TopicsAttribute](https://github.com/SorenZ/Alamut.Abstractions/blob/master/src/Alamut.Abstractions/Messaging/TopicsAttribute.cs).  
+Consumer automatically calls the classes that implemented [IMessageHandler<TMessage>](https://github.com/SorenZ/Alamut.Abstractions/blob/master/src/Alamut.Abstractions/Messaging/IMessageHandler%5BTMessage%5D.cs) interface and decorated with [TopicsAttribute](https://github.com/SorenZ/Alamut.Abstractions/blob/master/src/Alamut.Abstractions/Messaging/TopicsAttribute.cs).  
 
 **Message Handler Sample:**
 ```csharp
@@ -95,7 +95,7 @@ namespace Alamut.Kafka.Consumer.Subscribers
     [Topics("alamut.messaging.kafka")]
     public class SendSmsGeneric : IMessageHandler<FooMessage>
     {
-        private readonly ILogger<SendSmsGeneric> _logger;
+        private readonly ILogger _logger;
 
         public SendSmsGeneric(ILogger<SendSmsGeneric> logger)
         {
@@ -111,7 +111,25 @@ namespace Alamut.Kafka.Consumer.Subscribers
     }
 }
 ```
-In the example above [SendSmsGeneric](https://github.com/SorenZ/Alamut.Kafka/blob/master/samples/Alamut.Kafka.Consumer/Subscribers/SendSmsGeneric.cs) handles `FooMessage` that published in `alamut.messaging.kafka` Topic.
+In the example above [SendSmsGeneric](https://github.com/SorenZ/Alamut.Kafka/blob/master/samples/Alamut.Kafka.Consumer/Subscribers/SendSmsGeneric.cs) handles `FooMessage` that published in `alamut.messaging.kafka` Topic. (other Message handlers not yet documented)  
+
+**Consumer Registration and Wiring**
+* First of all, you need a simple configuration that described above.  
+* Then you have to register your Hosted Service to subscribe to Kafka Messages, There are two ways:  
+  * Register Hosted Service with default `GroupId` and specified `Topics` that provided in `KafkaConfig` section:  
+    `services.AddHostedService<KafkaSubscriber>();`
+  * Register Hosted Service with overwritten configuration for specifics Topic(s): 
+    `services.AddNewHostedSubscriber("alamut.group","alamut.messaging.kafka");`  
+    in this case, a Hosted Services registered and handles just provided Topic(s).  
+* Register Message Handlers:  
+    `services.RegisterMessageHandlers(typeof(SendSmsGeneric).Assembly);`   
+    registers all classes that implemented [IMessageHandler<TMessage>](https://github.com/SorenZ/Alamut.Abstractions/blob/master/src/Alamut.Abstractions/Messaging/IMessageHandler%5BTMessage%5D.cs) in the specified assembly.  
+ 
+With these three steps your wiring will be completed. ([example](https://github.com/SorenZ/Alamut.Kafka/blob/master/samples/Alamut.Kafka.Consumer/Startup.cs))  
+*There are other ways to do this that will be explained later*  
+
+
+
 
     
 
