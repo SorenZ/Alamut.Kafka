@@ -23,7 +23,7 @@ These simple basic settings are needed to communicate with Kafka
 "KafkaConfig": {
     "BootstrapServers": "10.104.51.12:9092,10.104.51.13:9092,10.104.51.14:9092",
     "GroupId": "alamut.group",
-    "Topics": ["alamut-soft"]
+    "Topics": ["alamut.messaging.kafka"]
   }
 ```
 You have to inject configuration as a [KafkaConfig](https://github.com/SorenZ/Alamut.Kafka/blob/master/src/Alamut.Kafka/Models/KafkaConfig.cs) into your DI :
@@ -49,14 +49,14 @@ The publisher could publish a message in a variety types of data structure:
 IPublisher publisher = new KafkaProducer(*/dependencies provided by DI*/);
 
 // string message
-await publisher.Publish("alamut-soft", "a string message");
+await publisher.Publish("alamut.messaging.kafka", "a string message");
 
 // object message
 var objectMessage = new Foo
 {
     Bar = message
 };
-await publisher.Publish("alamut-soft", objectMessage);
+await publisher.Publish("alamut.messaging.kafka", objectMessage);
 
 // IMessage message
 var typedMessage = new FooMessage // inherited from IMessage
@@ -65,7 +65,7 @@ var typedMessage = new FooMessage // inherited from IMessage
     EventName = "Alamut.Foo.Create",
     Bar = message
 };
-await publisher.Publish("alamut-soft", typedMessage);
+await publisher.Publish("alamut.messaging.kafka", typedMessage);
 ```
 
 **Register Producer**  
@@ -77,6 +77,43 @@ services.AddSingleton<IPublisher, KafkaProducer>();
 ***
 
 ### Consumer  
+Consumer subscribes to the specified topic(s) and works as a [Background Hosted Service](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/hosted-services).  
+
+Consumer automatically calls the classes that implemented [IMessageHandler<TMessage>)[https://github.com/SorenZ/Alamut.Abstractions/blob/master/src/Alamut.Abstractions/Messaging/IMessageHandler%5BTMessage%5D.cs] interface and decorated with [TopicsAttribute](https://github.com/SorenZ/Alamut.Abstractions/blob/master/src/Alamut.Abstractions/Messaging/TopicsAttribute.cs).  
+
+**Message Handler Sample:**
+```csharp
+using System.Threading;
+using System.Threading.Tasks;
+
+using Alamut.Abstractions.Messaging;
+using Alamut.Kafka.Models;
+using Microsoft.Extensions.Logging;
+
+namespace Alamut.Kafka.Consumer.Subscribers
+{
+    [Topics("alamut.messaging.kafka")]
+    public class SendSmsGeneric : IMessageHandler<FooMessage>
+    {
+        private readonly ILogger<SendSmsGeneric> _logger;
+
+        public SendSmsGeneric(ILogger<SendSmsGeneric> logger)
+        {
+            _logger = logger;
+
+        }
+        public Task Handle(FooMessage message, CancellationToken token)
+        {
+            _logger.LogInformation($"Received message <{ message.Bar }>");
+
+            return Task.CompletedTask;
+        }
+    }
+}
+```
+In the example above [SendSmsGeneric](https://github.com/SorenZ/Alamut.Kafka/blob/master/samples/Alamut.Kafka.Consumer/Subscribers/SendSmsGeneric.cs) handles `FooMessage` that published in `alamut.messaging.kafka` Topic.
+
+    
 
 
 
