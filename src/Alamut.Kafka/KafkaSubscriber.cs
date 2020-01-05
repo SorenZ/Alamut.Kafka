@@ -16,6 +16,7 @@ namespace Alamut.Kafka
     /// implements Kafka subscriber as a background service 
     /// it depends on KafkaConfig and ISubscriberHandler
     /// </summary>
+    /// <remarks>https://github.com/confluentinc/confluent-kafka-dotnet</remarks>
     public class KafkaSubscriber : BackgroundService
     {
         private const int commitPeriod = 5;
