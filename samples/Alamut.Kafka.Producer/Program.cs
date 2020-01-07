@@ -25,22 +25,24 @@ namespace Alamut.Kafka.Producer
             while (true)
             {
                 var message = Console.ReadLine();
-                // var dynamicMessage = new Foo
-                // {
-                //     Bar = message
-                // };
 
-                var typedMessage = new FooMessage
-                {
-                    // Id = IdGenerator.GetNewId(), // generate automatically in publisher
-                    EventName = "Alamut.Foo.Create",
-                    Bar = message,
-                    AcknowledgeRequested = true,
-                    AcknowledgeTopic = "mobin-soft"
-                };
+                // publish (inherited) Message
+                // var typedMessage = new FooMessage
+                // {
+                //     // Id = IdGenerator.GetNewId(), // generate automatically in publisher
+                //     EventName = "Alamut.Foo.Create",
+                //     Bar = message,
+                //     AcknowledgeRequested = true,
+                //     AcknowledgeTopic = "mobin-soft"
+                // };
                 
-                await publisher.Publish("mobin-net", typedMessage);
-                // await publisher.Publish("mobin-soft", "send sms to 0912");
+                // public (generic) message
+                var typedMessage = new Foo
+                {
+                    Bar = message
+                };
+
+                await publisher.Publish("mobin-net", Message<Foo>.Build(typedMessage));
             }
         }
 

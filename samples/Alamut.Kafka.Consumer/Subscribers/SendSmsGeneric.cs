@@ -9,7 +9,7 @@ using Alamut.Kafka.Models;
 namespace Alamut.Kafka.Consumer.Subscribers
 {
     [Topics(Startup.TestTopic)]
-    public class SendSmsGeneric : IMessageHandler<FooMessage>
+    public class SendSmsGeneric : IMessageHandler<Message<Foo>>
     {
         private readonly IPublisher _publisher;
         public SendSmsGeneric(IPublisher publisher)
@@ -18,9 +18,9 @@ namespace Alamut.Kafka.Consumer.Subscribers
 
         }
 
-        public Task Handle(FooMessage message, CancellationToken token)
+        public Task Handle(Message<Foo> message, CancellationToken token)
         {
-            Console.WriteLine($"Received message <{ message.Bar }>");
+            Console.WriteLine($"Received message <{ message.Body.Bar }>");
 
 
             if (message.AcknowledgeRequested)
