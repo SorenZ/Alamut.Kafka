@@ -3,7 +3,8 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Alamut.Abstractions.Messaging;
-using Alamut.Abstractions.Structure;
+using Alamut.Abstractions.Messaging.Handlers;
+using Alamut.Abstractions.Messaging.Messages;
 using Alamut.Kafka.Models;
 
 namespace Alamut.Kafka.Consumer.Subscribers
@@ -23,15 +24,15 @@ namespace Alamut.Kafka.Consumer.Subscribers
             Console.WriteLine($"Received message <{ message.Body.Bar }>");
 
 
-            if (message.AcknowledgeRequested)
-            {
-                _publisher.Publish(message.AcknowledgeTopic,
-                    new AcknowledgeMessage
-                    {
-                        Id = message.Id,
-                        Result = Result.Okay()
-                    });
-            }
+            // if (message.AcknowledgeRequested)
+            // {
+            //     _publisher.Publish(message.AcknowledgeTopic,
+            //         new AcknowledgeMessage
+            //         {
+            //             Id = message.Id,
+            //             Result = Result.Okay()
+            //         });
+            // }
 
             //await Task.Delay(TimeSpan.FromSeconds(10));
 

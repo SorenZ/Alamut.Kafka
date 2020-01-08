@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using Alamut.Abstractions.Messaging;
+using Alamut.Abstractions.Messaging.Handlers;
 
 namespace Alamut.Kafka
 {

@@ -1,9 +1,10 @@
 using System;
 using System.Threading.Tasks;
+
 using Alamut.Abstractions.Messaging;
 using Alamut.Helpers.DomainDriven;
-using Alamut.Kafka.Contracts;
 using Alamut.Kafka.Models;
+using Alamut.Abstractions.Messaging.MessageContracts;
 
 using Confluent.Kafka;
 

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 
 using Alamut.Abstractions.Messaging;
+using Alamut.Abstractions.Messaging.Handlers;
 using Alamut.Kafka.Models;
 using Alamut.Kafka.SubscriberHandlers;
 
@@ -28,7 +29,6 @@ namespace Alamut.Kafka
         {
             return services.AddTransient<IHostedService>(provider => 
             {
-                
                 var config = provider.GetRequiredService<KafkaConfig>();
                 
                 if(!string.IsNullOrEmpty(groupId))
@@ -54,7 +54,7 @@ namespace Alamut.Kafka
         /// <typeparam name="TMessageHandler">type of </typeparam>
         /// <returns></returns>
         public static IServiceCollection RegisterMessageHandlers<TMessageHandler>(this IServiceCollection services) 
-            // where TMessageHandler : IMessageHandler<>
+            where TMessageHandler : IMessageHandler 
             => RegisterMessageHandlers(services, typeof(TMessageHandler).Assembly);
 
         /// <summary>

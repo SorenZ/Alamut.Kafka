@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Alamut.Abstractions.Messaging;
+using Alamut.Abstractions.Messaging.Handlers;
 using Alamut.Kafka.Models;
 
 using Confluent.Kafka;

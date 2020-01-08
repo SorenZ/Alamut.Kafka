@@ -1,4 +1,4 @@
-using Alamut.Abstractions.Messaging;
+using Alamut.Abstractions.Messaging.MessageContracts;
 
 namespace Alamut.Kafka.Models
 {

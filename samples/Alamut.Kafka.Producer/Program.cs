@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
+
 using Alamut.Abstractions.Messaging;
 using Alamut.Kafka.Models;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -42,7 +44,7 @@ namespace Alamut.Kafka.Producer
                     Bar = message
                 };
 
-                await publisher.Publish("mobin-net", Message<Foo>.Build(typedMessage));
+                await publisher.Publish("mobin-net", MessageFactory.Build(typedMessage));
             }
         }
 
