@@ -2,8 +2,6 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Alamut.Kafka.Models;
-
 using Confluent.Kafka;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -22,12 +20,16 @@ namespace Alamut.Kafka.SubscriberHandlers
         private readonly IServiceProvider _serviceProvider;
         private readonly ILogger _logger;
         private readonly SubscriberBinding _binding;
+        private readonly ConsumerConfig _config;
+
 
         
         public GenericSubscriberHandler(IServiceProvider serviceProvider,
         ILogger<ISubscriberHandler> logger,
+        ConsumerConfig config,
         SubscriberBinding binding)
         {
+            _config = config;
             _serviceProvider = serviceProvider;
             _logger = logger;
             _binding = binding;
@@ -38,7 +40,7 @@ namespace Alamut.Kafka.SubscriberHandlers
             var isTopicHandlerAvailable = _binding.GenericTopicHandlers.TryGetValue(result.Topic, out var handlerType);
             if (!isTopicHandlerAvailable)
             {
-                _logger.LogWarning($"received message on topic <{result.Topic}>, but there is no handler registered for topic.");
+                _logger.LogWarning($"<{_config.GroupId}> received message on topic <{result.Topic}>, but there is no handler registered for topic.");
                 return;
             }
 
@@ -47,7 +49,7 @@ namespace Alamut.Kafka.SubscriberHandlers
 
                 var handler = this.GetHandler(scope, handlerType.Key);
 
-                _logger.LogTrace($"received message on topic <{result.Topic}>");
+                _logger.LogTrace($"<{_config.GroupId}> received message on topic <{result.Topic}>");
 
                 dynamic value = JsonConvert.DeserializeObject(result.Value, handlerType.Value);
                 
@@ -67,7 +69,7 @@ namespace Alamut.Kafka.SubscriberHandlers
             if (handler == null)
             {
                 throw new NullReferenceException(
-                    $"exception: no handler found for type <{handlerType}>");
+                    $"<{_config.GroupId}> exception: no handler found for type <{handlerType}>");
             }
 
             return handler;

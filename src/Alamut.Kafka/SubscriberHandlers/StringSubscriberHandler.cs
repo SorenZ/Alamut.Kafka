@@ -3,7 +3,6 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Alamut.Abstractions.Messaging.Handlers;
-using Alamut.Kafka.Models;
 
 using Confluent.Kafka;
 
@@ -17,16 +16,16 @@ namespace Alamut.Kafka.SubscriberHandlers
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly ILogger _logger;
-        private readonly KafkaConfig _kafkaConfig;
+        private readonly ConsumerConfig _config;
         private readonly SubscriberBinding _binding;
 
 
         public StringSubscriberHandler(IServiceProvider serviceProvider,
         ILogger<ISubscriberHandler> logger,
-        KafkaConfig kafkaConfig,
+        ConsumerConfig kafkaConfig,
         SubscriberBinding binding)
         {
-            _kafkaConfig = kafkaConfig;
+            _config = kafkaConfig;
             _serviceProvider = serviceProvider;
             _logger = logger;
             _binding = binding;
@@ -37,7 +36,7 @@ namespace Alamut.Kafka.SubscriberHandlers
             var isTopicHandlerAvailable = _binding.TopicHandlers.TryGetValue(result.Topic, out var handlerType);
             if (!isTopicHandlerAvailable)
             {
-                _logger.LogWarning($"<{_kafkaConfig.GroupId}> received message on topic <{result.Topic}>, but there is no handler registered for topic.");
+                _logger.LogWarning($"<{_config.GroupId}> received message on topic <{result.Topic}>, but there is no handler registered for topic.");
                 return;
             }
 
@@ -46,7 +45,7 @@ namespace Alamut.Kafka.SubscriberHandlers
 
                 var handler = this.GetHandler(scope, handlerType);
 
-                _logger.LogTrace($"<{_kafkaConfig.GroupId}> received message on topic <{result.Topic}>");
+                _logger.LogTrace($"<{_config.GroupId}> received message on topic <{result.Topic}>");
 
                 await handler.Handle(result.Value, token);
             }
@@ -58,7 +57,7 @@ namespace Alamut.Kafka.SubscriberHandlers
 
             if (handler == null)
             {
-                var nullRefEx = new NullReferenceException($"<{_kafkaConfig.GroupId}> exception: no handler found for type <{handlerType}>");
+                var nullRefEx = new NullReferenceException($"<{_config.GroupId}> exception: no handler found for type <{handlerType}>");
                 throw nullRefEx;
             }
 
@@ -67,7 +66,7 @@ namespace Alamut.Kafka.SubscriberHandlers
                 return eventHandler;
             }
 
-            var castEx = new InvalidCastException($"<{_kafkaConfig.GroupId}> exception: handler <{handlerType}> not of type <{typeof(IStringMessageHandler)}>");
+            var castEx = new InvalidCastException($"<{_config.GroupId}> exception: handler <{handlerType}> not of type <{typeof(IStringMessageHandler)}>");
             throw castEx;
         }
     }
