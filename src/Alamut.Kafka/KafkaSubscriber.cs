@@ -21,40 +21,30 @@ namespace Alamut.Kafka
     {
         private const int commitPeriod = 5;
         private readonly ILogger _logger;
-        private readonly KafkaConfig _kafkaConfig;
+        private readonly ConsumerConfig _config;
         private readonly ISubscriberHandler _handler;
-
+        private readonly string[] _topics;
 
         public KafkaSubscriber(ILoggerFactory loggerFactory,
-        KafkaConfig kafkaConfig,
-        ISubscriberHandler handler)
+        ConsumerConfig config,
+        ISubscriberHandler handler,
+        string[] topics)
         {
-            _kafkaConfig = kafkaConfig;
-            _logger = loggerFactory.CreateLogger(nameof(KafkaSubscriber) + "-" + kafkaConfig.GroupId);
+            _config = config;
+            _logger = loggerFactory.CreateLogger(nameof(KafkaSubscriber) + "-" + config.GroupId);
             _handler = handler;
+            _topics = topics;
         }
 
         protected override Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            var config = new ConsumerConfig
-            {
-                BootstrapServers = _kafkaConfig.BootstrapServers,
-                GroupId = _kafkaConfig.GroupId,
-                EnableAutoCommit = false,
-                // StatisticsIntervalMs = 5000,
-                SessionTimeoutMs = 6000,
-                AutoOffsetReset = AutoOffsetReset.Earliest,
-                EnablePartitionEof = true
-            };
-
-
 
             // Note: If a key or value deserializer is not set (as is the case below), the 
             // deserializer corresponding to the appropriate type from Confluent.Kafka.Deserializers
             // will be used automatically (where available). The default deserializer for string
             // is UTF8. The default deserializer for Ignore returns null for all input data
             // (including non-null data).
-            var consumer = new ConsumerBuilder<Ignore, string>(config)
+            var consumer = new ConsumerBuilder<Ignore, string>(_config)
                 // Note: All handlers are called on the main .Consume thread.
                 .SetErrorHandler((_, e) => _logger.LogError($"Error: {e.Reason}"))
                 // .SetStatisticsHandler((_, json) => Console.WriteLine($"Statistics: {json}"))
@@ -72,7 +62,8 @@ namespace Alamut.Kafka
                 })
                 .Build();
 
-            consumer.Subscribe(_kafkaConfig.Topics);
+            // consumer.Subscribe(_kafkaConfig.Topics);
+            consumer.Subscribe(_topics);
 
             Task.Run(async () => await Consume(consumer, cancellationToken), cancellationToken);
 

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 using Alamut.Abstractions.Messaging;
 using Alamut.Kafka.Models;
-
+using Confluent.Kafka;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -21,7 +21,7 @@ namespace Alamut.Kafka.Producer
             Console.WriteLine("start Kafka producer");
 
             IPublisher publisher = new KafkaProducer(
-                new Models.KafkaConfig { BootstrapServers = "10.104.51.12:9092,10.104.51.13:9092,10.104.51.14:9092" },
+                new ProducerConfig { BootstrapServers = "10.104.51.12:9092,10.104.51.13:9092,10.104.51.14:9092" },
                 serviceProvider.GetService<ILogger<KafkaProducer>>());
             
             while (true)

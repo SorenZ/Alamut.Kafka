@@ -7,6 +7,7 @@ using Alamut.AspNet.Configuration;
 using Alamut.Kafka.Consumer.Subscribers;
 using Alamut.Kafka.Models;
 using Alamut.Kafka.SubscriberHandlers;
+using Confluent.Kafka;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -29,9 +30,10 @@ namespace Alamut.Kafka.Consumer
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddPoco<KafkaConfig>(Configuration);
+            services.AddPoco<ConsumerConfig>(Configuration, "KafkaConfig");
+            services.AddPoco<ProducerConfig>(Configuration, "KafkaConfig");
             //services.AddHostedService<KafkaSubscriber>();
-            services.AddNewHostedSubscriber("group1","mobin-net");
+            services.AddNewHostedSubscriber("mobin-net");
             //services.AddNewHostedSubscriber("group2","mobin-net");
             //services.AddNewHostedSubscriber("group3","mobin-net");
             services.AddScoped<IPublisher,KafkaProducer>();

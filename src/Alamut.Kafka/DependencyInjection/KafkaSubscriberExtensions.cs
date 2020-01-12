@@ -7,7 +7,7 @@ using Alamut.Abstractions.Messaging;
 using Alamut.Abstractions.Messaging.Handlers;
 using Alamut.Kafka.Models;
 using Alamut.Kafka.SubscriberHandlers;
-
+using Confluent.Kafka;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -20,30 +20,22 @@ namespace Alamut.Kafka
         /// adds a new Kafka subscriber as HostedService (long running back-ground service)
         /// </summary>
         /// <param name="services"></param>
-        /// <param name="groupId">group Id to subscribes with it, if it's not provided use groupId in KafkaConfig</param>
         /// <param name="topics">topics to subscribes, if it's not provided subscribes to all topics in KafkaConfig</param>
         /// <returns></returns>
-        public static IServiceCollection AddNewHostedSubscriber(this IServiceCollection services, 
-        string groupId = null, 
-        params string[] topics)
+        public static IServiceCollection AddNewHostedSubscriber(this IServiceCollection services,params string[] topics)
         {
-            return services.AddTransient<IHostedService>(provider => 
+            return services.AddTransient<IHostedService>(provider =>
             {
-                var config = provider.GetRequiredService<KafkaConfig>();
-                
-                if(!string.IsNullOrEmpty(groupId))
-                { config.GroupId = groupId; }
+                var config = provider.GetRequiredService<ConsumerConfig>();
 
-                if(topics != null && topics.Any())
-                { config.Topics = topics; }
-
-                // TODO : check topics and groups for null and emptry
-
+                if (topics == null)
+                { throw new ArgumentNullException(nameof(topics)); }
 
                 return new KafkaSubscriber(
                     provider.GetRequiredService<ILoggerFactory>(),
                     config,
-                    provider.GetRequiredService<ISubscriberHandler>());
+                    provider.GetRequiredService<ISubscriberHandler>(),
+                    topics);
             });
         }
 
@@ -53,8 +45,8 @@ namespace Alamut.Kafka
         /// </summary>
         /// <typeparam name="TMessageHandler">type of </typeparam>
         /// <returns></returns>
-        public static IServiceCollection RegisterMessageHandlers<TMessageHandler>(this IServiceCollection services) 
-            where TMessageHandler : IMessageHandler 
+        public static IServiceCollection RegisterMessageHandlers<TMessageHandler>(this IServiceCollection services)
+            where TMessageHandler : IMessageHandler
             => RegisterMessageHandlers(services, typeof(TMessageHandler).Assembly);
 
         /// <summary>
@@ -76,11 +68,11 @@ namespace Alamut.Kafka
                 // https://docs.microsoft.com/en-us/dotnet/api/system.type.getinterface
                 var messageType = messageHandlerType.GetInterface(typeof(IMessageHandler<>).Name).GetGenericArguments()[0];
 
-                var topics = messageHandlerType.GetCustomAttribute<TopicsAttribute>()?.Topics 
+                var topics = messageHandlerType.GetCustomAttribute<TopicsAttribute>()?.Topics
                     ?? throw new Exception($"{nameof(TopicsAttribute)} does not defined for MessageHandler : {messageHandlerType.Name}");
 
                 subscriberBinding.RegisterTopicHandler(messageHandlerType, messageType, topics);
-                
+
                 services.AddScoped(messageHandlerType);
             }
 

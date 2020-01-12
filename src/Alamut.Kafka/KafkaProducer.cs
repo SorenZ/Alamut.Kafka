@@ -22,15 +22,9 @@ namespace Alamut.Kafka
         private readonly IProducer<Null, string> _producer;
         private readonly ILogger<KafkaProducer> _logger;
 
-        public KafkaProducer(KafkaConfig kafkaConfig, ILogger<KafkaProducer> logger)
+        public KafkaProducer(ProducerConfig config, ILogger<KafkaProducer> logger)
         {
             _logger = logger;
-            var config = new ProducerConfig
-            {
-                BootstrapServers = kafkaConfig.BootstrapServers
-                ?? throw new ArgumentNullException(nameof(kafkaConfig.BootstrapServers))
-            };
-
             _producer = new ProducerBuilder<Null, string>(config).Build();
         }
 
