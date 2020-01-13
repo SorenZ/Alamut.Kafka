@@ -44,7 +44,7 @@ namespace Alamut.Kafka.Producer
                     Bar = message
                 };
 
-                await publisher.Publish("mobin-net", MessageFactory.Build(typedMessage));
+                await publisher.PublishAsync("mobin-net", MessageFactory.Build(typedMessage));
             }
         }
 

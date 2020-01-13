@@ -28,7 +28,47 @@ namespace Alamut.Kafka
             _producer = new ProducerBuilder<Null, string>(config).Build();
         }
 
-        public async Task Publish(string topic, string message)
+        public void Publish(string topic, string message)
+        {
+            if (message == null) { throw new ArgumentNullException(nameof(message)); }
+            if (string.IsNullOrEmpty(topic)) { throw new ArgumentNullException(nameof(topic)); }
+
+            try
+            {
+                // Note: Awaiting the asynchronous produce request below prevents flow of execution
+                // from proceeding until the acknowledgement from the broker is received (at the 
+                // expense of low throughput).
+                _producer.Produce(
+                    topic,
+                    new Message<Null, string> { Value = message });
+            }
+            catch (ProduceException<Null, string> e)
+            {
+                _logger.LogError($"failed to deliver message: {e.Message} [{e.Error.Code}]");
+                throw;
+            }
+        }
+
+        public void Publish(string topic, object message)
+        {
+            if (message == null) 
+            { throw new ArgumentNullException(nameof(message)); }
+
+            Publish(topic, JsonConvert.SerializeObject(message));
+        }
+
+        public void Publish(string topic, IMessage message)
+        {
+            if (message == null) 
+            { throw new ArgumentNullException(nameof(message)); }
+
+            if(message.Id == null)
+            { message.Id = IdGenerator.GetNewId(); }
+
+            Publish(topic, JsonConvert.SerializeObject(message));
+        }
+
+        public async Task PublishAsync(string topic, string message)
         {
             if (message == null) { throw new ArgumentNullException(nameof(message)); }
             if (string.IsNullOrEmpty(topic)) { throw new ArgumentNullException(nameof(topic)); }
@@ -51,21 +91,22 @@ namespace Alamut.Kafka
             }
         }
 
-        public async Task Publish(string topic, object message)
+        public async Task PublishAsync(string topic, object message)
         {
             if (message == null) { throw new ArgumentNullException(nameof(message)); }
 
-            await Publish(topic, JsonConvert.SerializeObject(message));
+            await PublishAsync(topic, JsonConvert.SerializeObject(message));
         }
 
-        public async Task Publish(string topic, IMessage message)
+        public async Task PublishAsync(string topic, IMessage message)
         {
-            if (message == null) { throw new ArgumentNullException(nameof(message)); }
+            if (message == null) 
+            { throw new ArgumentNullException(nameof(message)); }
 
             if(message.Id == null)
             { message.Id = IdGenerator.GetNewId(); }
 
-            await Publish(topic, JsonConvert.SerializeObject(message));
+            await PublishAsync(topic, JsonConvert.SerializeObject(message));
         }
     }
 }
