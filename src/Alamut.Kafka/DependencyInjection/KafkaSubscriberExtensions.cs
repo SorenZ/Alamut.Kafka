@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 
 using Alamut.Abstractions.Messaging;
 using Alamut.Abstractions.Messaging.Handlers;
-using Alamut.Kafka.Models;
+using Alamut.Kafka.DependencyInjection;
 using Alamut.Kafka.SubscriberHandlers;
+
 using Confluent.Kafka;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -22,7 +23,16 @@ namespace Alamut.Kafka
         /// <param name="services"></param>
         /// <param name="topics">topics to subscribes, if it's not provided subscribes to all topics in KafkaConfig</param>
         /// <returns></returns>
-        public static IServiceCollection AddNewHostedSubscriber(this IServiceCollection services,params string[] topics)
+        public static IServiceCollection AddNewHostedSubscriber(this IServiceCollection services, params string[] topics)
+            => AddNewHostedSubscriber(services, topics);
+
+        /// <summary>
+        /// adds a new Kafka subscriber as HostedService (long running back-ground service)
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="topics">topics to subscribes, if it's not provided subscribes to all topics in KafkaConfig</param>
+        /// <returns></returns>
+        public static IServiceCollection AddNewHostedSubscriber(this IServiceCollection services, IEnumerable<string> topics)
         {
             return services.AddTransient<IHostedService>(provider =>
             {
@@ -61,7 +71,7 @@ namespace Alamut.Kafka
         {
             var subscriberBinding = new SubscriberBinding();
 
-            var types = GetClassesImplementingAnInterface(assemblies, typeof(IMessageHandler<>));
+            var types = KafkaHelper.GetClassesImplementingAnInterface(assemblies, typeof(IMessageHandler<>));
 
             foreach (var messageHandlerType in types)
             {
@@ -81,68 +91,7 @@ namespace Alamut.Kafka
 
             return services;
         }
-
-        private static IList<Type> GetClassesImplementingAnInterface(Assembly[] assembliesToScan, Type implementedInterface)
-        {
-            // if (implementedInterface == null || !implementedInterface.IsInterface)
-            //     return Tuple.Create(false, (IList<Type>)null);
-
-            IEnumerable<Type> typesInTheAssembly;
-
-            try
-            {
-                typesInTheAssembly = assembliesToScan
-                    .Select(s => s.GetTypes())
-                    .SelectMany(s => s);
-            }
-            catch (ReflectionTypeLoadException e)
-            {
-                typesInTheAssembly = e.Types.Where(t => t != null);
-            }
-
-            IList<Type> classesImplementingInterface = new List<Type>();
-
-            // if the interface is a generic interface
-            if (implementedInterface.IsGenericType)
-            {
-                foreach (var typeInTheAssembly in typesInTheAssembly)
-                {
-                    if (typeInTheAssembly.IsClass)
-                    {
-                        var typeInterfaces = typeInTheAssembly.GetInterfaces();
-                        foreach (var typeInterface in typeInterfaces)
-                        {
-                            if (typeInterface.IsGenericType)
-                            {
-                                var typeGenericInterface = typeInterface.GetGenericTypeDefinition();
-                                var implementedGenericInterface = implementedInterface.GetGenericTypeDefinition();
-
-                                if (typeGenericInterface == implementedGenericInterface)
-                                {
-                                    classesImplementingInterface.Add(typeInTheAssembly);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            else
-            {
-                foreach (var typeInTheAssembly in typesInTheAssembly)
-                {
-                    if (typeInTheAssembly.IsClass)
-                    {
-                        // if the interface is a non-generic interface
-                        if (implementedInterface.IsAssignableFrom(typeInTheAssembly))
-                        {
-                            classesImplementingInterface.Add(typeInTheAssembly);
-                        }
-                    }
-                }
-            }
-            return classesImplementingInterface;
-        }
-
+        
     }
 
 

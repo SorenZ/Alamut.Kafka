@@ -35,8 +35,6 @@ namespace Alamut.Kafka
 
             try
             {
-                // var serializedMessage = JsonConvert.SerializeObject(message);
-
                 // Note: Awaiting the asynchronous produce request below prevents flow of execution
                 // from proceeding until the acknowledgement from the broker is received (at the 
                 // expense of low throughput).
@@ -51,8 +49,6 @@ namespace Alamut.Kafka
                 _logger.LogError($"failed to deliver message: {e.Message} [{e.Error.Code}]");
                 throw;
             }
-
-
         }
 
         public async Task Publish(string topic, object message)

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Alamut.Abstractions.Messaging;
 using Alamut.AspNet.Configuration;
 using Alamut.Kafka.Consumer.Subscribers;
+using Alamut.Kafka.DependencyInjection;
 using Alamut.Kafka.Models;
 using Alamut.Kafka.SubscriberHandlers;
 using Confluent.Kafka;
@@ -33,7 +34,8 @@ namespace Alamut.Kafka.Consumer
             services.AddPoco<ConsumerConfig>(Configuration, "KafkaConfig");
             services.AddPoco<ProducerConfig>(Configuration, "KafkaConfig");
             //services.AddHostedService<KafkaSubscriber>();
-            services.AddNewHostedSubscriber("mobin-net");
+            // services.AddNewHostedSubscriber("mobin-net");
+            services.AddNewHostedSubscriber(KafkaHelper.GetAllTopics(typeof(SendSmsGeneric).Assembly));
             //services.AddNewHostedSubscriber("group2","mobin-net");
             //services.AddNewHostedSubscriber("group3","mobin-net");
             services.AddScoped<IPublisher,KafkaProducer>();

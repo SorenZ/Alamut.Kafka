@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -23,12 +24,12 @@ namespace Alamut.Kafka
         private readonly ILogger _logger;
         private readonly ConsumerConfig _config;
         private readonly ISubscriberHandler _handler;
-        private readonly string[] _topics;
+        private readonly IEnumerable<string> _topics;
 
         public KafkaSubscriber(ILoggerFactory loggerFactory,
         ConsumerConfig config,
         ISubscriberHandler handler,
-        string[] topics)
+        IEnumerable<string> topics)
         {
             _config = config;
             _logger = loggerFactory.CreateLogger(nameof(KafkaSubscriber) + "-" + config.GroupId);
