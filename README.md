@@ -3,6 +3,8 @@ The purpose of this library is to easy to use Apache.Kafka in Dotnet (Console, A
 Actually it's a wrapper of [Confluent's Apache Kafka .NET client](https://github.com/confluentinc/confluent-kafka-dotnet)
 
 ***
+*Documentation is based on [v0.6.0](https://github.com/SorenZ/Alamut.Kafka/tree/v0.6.0) and requires extensive updating!*
+***
 
 ### Installing Alamut.Kafka
 You should install [Alamut.Kafka with NuGet](https://www.nuget.org/packages/Alamut.Kafka):
