@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 using Alamut.Abstractions.Messaging;
@@ -24,7 +25,7 @@ namespace Alamut.Kafka
         /// <param name="topics">topics to subscribes, if it's not provided subscribes to all topics in KafkaConfig</param>
         /// <returns></returns>
         public static IServiceCollection AddNewHostedSubscriber(this IServiceCollection services, params string[] topics)
-            => AddNewHostedSubscriber(services, topics);
+            => AddNewHostedSubscriber(services, new List<string>(topics));
 
         /// <summary>
         /// adds a new Kafka subscriber as HostedService (long running back-ground service)
