@@ -20,17 +20,22 @@ Either commands, from Package Manager Console or .NET Core CLI, will download an
 ***
 
 ### Basic Configuration
-These simple basic settings are needed to communicate with Kafka
+These simple basic settings are needed to communicate with Kafka  
+*This configuration will be used for both `ProducerConfig` and `ConsumerConfig` *
 ```js
 "KafkaConfig": {
     "BootstrapServers": "10.104.51.12:9092,10.104.51.13:9092,10.104.51.14:9092",
     "GroupId": "alamut.group",
-    "Topics": ["alamut.messaging.kafka"]
+    // All Producer and Consumer configuration
   }
 ```
-You have to inject configuration as a [KafkaConfig](https://github.com/SorenZ/Alamut.Kafka/blob/master/src/Alamut.Kafka/Models/KafkaConfig.cs) into your DI :
+
+You have to inject configuration into your DI :
 ```csharp
-services.AddPoco<KafkaConfig>(Configuration);
+// for Consumer configuration
+services.AddPoco<ConsumerConfig>(Configuration, "KafkaConfig");
+// for Producer configuration
+services.AddPoco<ProducerConfig>(Configuration, "KafkaConfig");
 ```
 *[AddPoco](https://github.com/SorenZ/Alamut.AspNet/wiki/Add-POCO) is an Alamut Helper*
 
@@ -61,14 +66,13 @@ var objectMessage = new Foo
 await publisher.Publish("alamut.messaging.kafka", objectMessage);
 
 // IMessage message
-var typedMessage = new FooMessage // inherited from IMessage
+var typedMessage = new Foo
 {
-    // Id = IdGenerator.GetNewId(), // generate automatically in publisher
-    EventName = "Alamut.Foo.Create",
     Bar = message
 };
-await publisher.Publish("alamut.messaging.kafka", typedMessage);
+await publisher.Publish("alamut.messaging.kafka", MessageFactory.Build(typedMessage));
 ```
+*we will talk about the [MessageFactory](https://github.com/SorenZ/Alamut.Abstractions/blob/master/src/Alamut.Abstractions/Messaging/MessageFactory.cs) in more details latter.*
 
 **Register Producer**  
 If you want to get IPublisher through DI you should register it in project Startup:  
