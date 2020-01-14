@@ -9,11 +9,27 @@ namespace Alamut.Kafka
     /// <summary>
     /// responsible for holding a map between topics and types those should handle the topic 
     /// </summary>
-    public class SubscriberBinding 
+    public class SubscriberBinding
     {
+        /// <summary>
+        /// represents the registered topics so far by Subscriber-Binding
+        /// </summary>
+        /// <value></value>
+        public IList<string> RegisteredTopics
+        {
+            get
+            {
+                var topics = new List<string>();
+
+                topics.AddRange(TopicHandlers.Keys);
+                topics.AddRange(GenericTopicHandlers.Keys);
+
+                return topics;
+            }
+        }
         public IDictionary<string, Type> TopicHandlers { get; private set; } = new Dictionary<string, Type>();
-        public IDictionary<string, KeyValuePair<Type,Type>> GenericTopicHandlers { get; internal set; }
-            = new Dictionary<string, KeyValuePair<Type,Type>>();
+        public IDictionary<string, KeyValuePair<Type, Type>> GenericTopicHandlers { get; internal set; }
+            = new Dictionary<string, KeyValuePair<Type, Type>>();
 
         public SubscriberBinding RegisterTopicHandler<TSubscriber>(string topic)
         {
@@ -34,12 +50,12 @@ namespace Alamut.Kafka
         public SubscriberBinding RegisterTopicHandler<TMessageHandler, TMessage>(params string[] topics)
             where TMessageHandler : IMessageHandler<TMessage>
         {
-            if (topics == null || !topics.Any()) 
-                { throw new ArgumentNullException("Topics were not provided for MessageHandler : " + typeof(TMessageHandler).Name); }
+            if (topics == null || !topics.Any())
+            { throw new ArgumentNullException("Topics were not provided for MessageHandler : " + typeof(TMessageHandler).Name); }
 
             foreach (var topic in topics)
             {
-                this.GenericTopicHandlers[topic] = new KeyValuePair<Type, Type>(typeof(TMessageHandler),typeof(TMessage));
+                this.GenericTopicHandlers[topic] = new KeyValuePair<Type, Type>(typeof(TMessageHandler), typeof(TMessage));
             }
 
             return this;
@@ -47,17 +63,17 @@ namespace Alamut.Kafka
 
         public SubscriberBinding RegisterTopicHandler(Type typeMessageHandler, Type typeMessage, params string[] topics)
         {
-            if (topics == null || !topics.Any()) 
-                { throw new ArgumentNullException("Topics were not provided for MessageHandler : " + typeMessageHandler.Name); }
+            if (topics == null || !topics.Any())
+            { throw new ArgumentNullException("Topics were not provided for MessageHandler : " + typeMessageHandler.Name); }
 
             foreach (var topic in topics)
             {
-                this.GenericTopicHandlers[topic] = new KeyValuePair<Type, Type>(typeMessageHandler,typeMessage);
+                this.GenericTopicHandlers[topic] = new KeyValuePair<Type, Type>(typeMessageHandler, typeMessage);
             }
 
             return this;
         }
-        
+
     }
 
 

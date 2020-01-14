@@ -31,14 +31,28 @@ namespace Alamut.Kafka.Consumer
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            // --------------<( configuration )>---------------------------- 
             services.AddPoco<ConsumerConfig>(Configuration, "KafkaConfig");
             services.AddPoco<ProducerConfig>(Configuration, "KafkaConfig");
-            //services.AddHostedService<KafkaSubscriber>();
+            
+            // --------------<( register publisher )>---------------------------- 
+            services.AddScoped<IPublisher,KafkaProducer>();
+
+            // --------------<( register handlers  )>---------------------------- 
+            var registeredTopics = services.RegisterMessageHandlers(typeof(SendSmsGeneric).Assembly);
+
+            // --------------<( register hoster service  )>---------------------------- 
+            /* 1- */ services.AddNewHostedSubscriber(registeredTopics); 
+            /* 2- */ //services.AddHostedSubscriber();
+            
+            // --------------<( register hosted service)>---------------------------- 
+            // services.AddHostedService<KafkaSubscriber>();
             // services.AddNewHostedSubscriber("mobin-net");
-            services.AddNewHostedSubscriber(KafkaHelper.GetAllTopics(typeof(SendSmsGeneric).Assembly));
+            // services.AddNewHostedSubscriber(KafkaHelper.GetAllTopics(typeof(SendSmsGeneric).Assembly));
             //services.AddNewHostedSubscriber("group2","mobin-net");
             //services.AddNewHostedSubscriber("group3","mobin-net");
-            services.AddScoped<IPublisher,KafkaProducer>();
+            
+            
 
             // --------------<( string handler)>---------------------------- 
             // services.AddSingleton<ISubscriberHandler, StringSubscriberHandler>();
@@ -73,7 +87,6 @@ namespace Alamut.Kafka.Consumer
             // -----------------------------------------------------------------
 
             // --------------<( Generic handler - DI Helpers)>------------------
-            services.RegisterMessageHandlers(typeof(SendSmsGeneric).Assembly);
             // services.RegisterMessageHandlers<SendSmsGeneric>();
             // -----------------------------------------------------------------
 

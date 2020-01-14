@@ -50,13 +50,51 @@ namespace Alamut.Kafka
             });
         }
 
+        /// <summary>
+        /// - adds a new Kafka subscriber as HostedService (long running back-ground service)  
+        /// - register topics previously discovered by SubscriberBinding
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns>
+        /// registered topics
+        /// </returns>
+        /// <remarks>
+        /// - register topics previously discovered by SubscriberBinding
+        /// - it should be registered once
+        /// </remarks>
+         public static IList<string> AddHostedSubscriber(this IServiceCollection services)
+        {
+            IList<string> topics = null;
+
+            services.AddTransient<IHostedService>(provider =>
+            {
+                var config = provider.GetRequiredService<ConsumerConfig>();
+                
+                var subscriberBinding = provider.GetRequiredService<SubscriberBinding>();
+                topics = subscriberBinding.RegisteredTopics;
+
+                if (topics == null)
+                { throw new ArgumentNullException(nameof(topics)); }
+
+                return new KafkaSubscriber(
+                    provider.GetRequiredService<ILoggerFactory>(),
+                    config,
+                    provider.GetRequiredService<ISubscriberHandler>(),
+                    topics);
+            });
+
+            return topics;
+        }
+
 
         /// <summary>
         /// registers all MessageHandler in Assembly specified by type parameter
         /// </summary>
         /// <typeparam name="TMessageHandler">type of </typeparam>
-        /// <returns></returns>
-        public static IServiceCollection RegisterMessageHandlers<TMessageHandler>(this IServiceCollection services)
+        /// <returns>
+        /// registered topics
+        /// </returns>
+        public static IList<string> RegisterMessageHandlers<TMessageHandler>(this IServiceCollection services)
             where TMessageHandler : IMessageHandler
             => RegisterMessageHandlers(services, typeof(TMessageHandler).Assembly);
 
@@ -67,9 +105,12 @@ namespace Alamut.Kafka
         /// </summary>
         /// <param name="services"></param>
         /// <param name="assemblies"></param>
-        /// <returns></returns>
-        public static IServiceCollection RegisterMessageHandlers(this IServiceCollection services, params Assembly[] assemblies)
+        /// <returns>
+        /// registered topics
+        /// </returns>
+        public static IList<string> RegisterMessageHandlers(this IServiceCollection services, params Assembly[] assemblies)
         {
+            var registeredTopics = new List<string>();
             var subscriberBinding = new SubscriberBinding();
 
             var types = KafkaHelper.GetClassesImplementingAnInterface(assemblies, typeof(IMessageHandler<>));
@@ -85,12 +126,14 @@ namespace Alamut.Kafka
                 subscriberBinding.RegisterTopicHandler(messageHandlerType, messageType, topics);
 
                 services.AddScoped(messageHandlerType);
+
+                registeredTopics.AddRange(topics);
             }
 
             services.AddSingleton(subscriberBinding);
             services.AddSingleton<ISubscriberHandler, GenericSubscriberHandler>();
 
-            return services;
+            return registeredTopics;
         }
         
     }

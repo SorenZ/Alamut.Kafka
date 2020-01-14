@@ -8,6 +8,11 @@ namespace Alamut.Kafka.DependencyInjection
 {
     public static class KafkaHelper
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="assembliesToScan"></param>
+        /// <returns></returns>
         public static List<string> GetAllTopics(params Assembly[] assembliesToScan)
         {
             List<string> topics = new List<string>();    
