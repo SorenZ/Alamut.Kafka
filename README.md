@@ -2,7 +2,6 @@
 The purpose of this library is to easy to use Apache.Kafka in Dotnet (Console, ASP.NET, Web API) application on top of Dotnet Core Dependency Injection infrastructure.  
 Actually it's a wrapper of [Confluent's Apache Kafka .NET client](https://github.com/confluentinc/confluent-kafka-dotnet)
 
-***
 *Documentation is based on [v0.8.1](https://github.com/SorenZ/Alamut.Kafka/tree/v0.8.1)*
 ***
 
