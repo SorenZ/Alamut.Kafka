@@ -41,7 +41,7 @@ namespace Alamut.Kafka.Consumer
             // --------------<( register handlers  )>---------------------------- 
             var registeredTopics = services.RegisterMessageHandlers(typeof(SendSmsGeneric).Assembly);
 
-            // --------------<( register hoster service  )>---------------------------- 
+            // --------------<( register hosted service  )>---------------------------- 
             /* 1- */ services.AddNewHostedSubscriber(registeredTopics); 
             /* 2- */ //services.AddHostedSubscriber();
             
